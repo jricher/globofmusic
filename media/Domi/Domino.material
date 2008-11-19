@@ -1,0 +1,198 @@
+material Domino-waiting2
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.9 0.9 0.0 1.000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material Domino-armed
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.831174 0.0 0.000000 1.000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material Domino-fired
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.500000
+			diffuse 0.0 0.605551 0.000000 0.500000
+			specular 1.000000 1.000000 1.000000 0.500000 62.250000
+			emissive 0.000000 0.500000 0.000000 1.000000
+		}
+	}
+}
+material Domino-done
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.0 0.605551 0.000000 1.000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+
+material Domino-waiting
+{
+  technique
+  {
+    pass
+    {
+      lighting off
+      scene_blend alpha_blend
+      depth_write off
+      
+      texture_unit
+      {
+        texture WoodPallet.png
+        alpha_op_ex source1 src_manual src_texture 0.8	  
+      }
+    }
+  }
+}
+material njrWoodPallet-waiting
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 12.5
+
+			texture_unit
+			{
+				texture WoodPallet.png
+				filtering trilinear
+			}
+		}
+	}
+}
+material njrWoodPallet-armed
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 0.0 1.0 0.0 1.0
+			specular 0.0 0.0 0.0 1.0 12.5
+		}
+	}
+}
+material njrWoodPallet-fired
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 12.5
+		}
+	}
+}
+material njrWoodPallet-done
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 12.5
+
+			texture_unit
+			{
+				texture WoodPallet.png
+				filtering trilinear
+			}
+		}
+	}
+}
+
+material ResetPlatform-waiting
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.9 0.9 0.0 1.000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+
+
+material ResetPlatform-armed
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.831174 0.0 0.000000 1.000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material ResetPlatfom-fired
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.0 0.605551 0.000000 1.000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material ResetPlatform-done
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.9 0.9 0.0 1.000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}

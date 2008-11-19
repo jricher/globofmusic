@@ -1,0 +1,542 @@
+material mazeGlass-hole-done
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.337666
+			diffuse 0.788000 0.296000 0.488000 1.0
+			specular 0.500000 0.500000 0.500000 0.337666 12.500000
+			emissive 0.000000 0.000000 0.000000 0.337666
+		}
+	}
+}
+material mazeGlass-hole-fired
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.337666
+			diffuse 0.788000 0.296000 0.488000 1.0
+			specular 0.500000 0.500000 0.500000 0.337666 12.500000
+			emissive 0.000000 0.000000 0.000000 0.337666
+		}
+	}
+}
+material mazeGlass-hole-armed
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.337666
+			diffuse 0.448000 0.748000 0.488000 1.0
+			specular 0.500000 0.500000 0.500000 0.337666 12.500000
+			emissive 0.000000 0.000000 0.000000 0.337666
+		}
+	}
+}
+material mazeGlass-hole-waiting
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.337666
+			diffuse 0.388000 0.296000 0.788000 1.0
+			specular 0.500000 0.500000 0.500000 0.337666 12.500000
+			emissive 0.000000 0.000000 0.000000 0.337666
+		}
+	}
+}
+
+material mazeGlass-key-done
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.337666
+			diffuse 0.788000 0.988000 0.788000 0.737666
+			specular 0.500000 0.500000 0.500000 0.337666 12.500000
+			emissive 0.000000 0.000000 0.000000 0.337666
+			scene_blend alpha_blend
+			depth_write off
+		}
+	}
+}
+material mazeGlass-key-fired
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.337666
+			diffuse 0.788000 0.988000 0.788000 0.737666
+			specular 0.500000 0.500000 0.500000 0.337666 12.500000
+			emissive 0.000000 0.000000 0.000000 0.337666
+			scene_blend alpha_blend
+			depth_write off
+		}
+	}
+}
+material mazeGlass-key-armed
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.337666
+			diffuse 0.788000 0.296000 0.296000 0.537666
+			specular 0.500000 0.500000 0.500000 0.337666 12.500000
+			emissive 0.000000 0.000000 0.000000 0.337666
+			scene_blend alpha_blend
+			depth_write off
+		}
+	}
+}
+material mazeGlass-key-waiting
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.337666
+			diffuse 0.788000 0.788000 0.296000 0.95666
+			specular 0.500000 0.500000 0.500000 0.337666 12.500000
+			emissive 0.000000 0.000000 0.000000 0.337666
+			scene_blend alpha_blend
+			depth_write off
+		}
+	}
+}
+
+
+material mazeGlass0-armed
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.700000 0.100000 0.300000 0.700000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass1-armed
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.700000 0.100000 0.300000 0.700000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass2-armed
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.700000 0.100000 0.300000 0.700000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass3-armed
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.700000 0.100000 0.300000 0.700000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass4-armed
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.700000 0.100000 0.300000 0.700000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass5-armed
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.700000 0.100000 0.300000 0.700000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+material mazeGlass0-waiting
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.200000 1.000000 1.000000 0.030000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass0-fired
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.200000 1.000000 1.000000 0.33
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass0-done
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.200000 1.000000 1.000000 0.33
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+material mazeGlass1-waiting
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.500000 0.400000 0.100000 0.030000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass1-done
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.500000 0.400000 0.100000 0.530000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+material mazeGlass1-fired
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.500000 0.400000 0.100000 0.530000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+material mazeGlass2-waiting
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.100000 0.400000 0.100000 0.030000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+material mazeGlass2-fired
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.100000 0.400000 0.100000 0.530000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+material mazeGlass2-done
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.100000 0.400000 0.100000 0.530000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+material mazeGlass3-waiting
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.500000 0.300000 0.500000 0.030000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass3-done
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.500000 0.300000 0.500000 0.430000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+material mazeGlass3-fired
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.500000 0.300000 0.500000 0.430000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass5-waiting
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.500000 0.100000 0.100000 0.030000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass5-fired
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.500000 0.100000 0.100000 0.530000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass5-done
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 0.500000 0.100000 0.100000 0.530000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass4-waiting
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 1.000000 1.000000 1.000000 0.030000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass4-fired
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 1.000000 1.000000 1.000000 0.530000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+
+
+material mazeGlass4-done
+{
+        receive_shadows off
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 0.337666
+                        diffuse 1.000000 1.000000 1.000000 0.530000
+                        specular 0.500000 0.500000 0.500000 0.337666 12.500000
+                        emissive 0.000000 0.000000 0.000000 0.337666
+                        scene_blend alpha_blend
+                        depth_write off
+                }
+        }
+}
+

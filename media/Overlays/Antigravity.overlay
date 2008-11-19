@@ -1,0 +1,20 @@
+AntigravityOverlay
+{
+	zorder 500
+
+	container Panel(Antigravity)
+	{
+		metrics_mode pixels
+		horz_align left
+		vert_align top
+		left 10
+		top 10
+		width 400
+		height 100
+		material AntigravityMaterial
+
+	}
+
+}
+
+

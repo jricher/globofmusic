@@ -1,0 +1,29 @@
+
+material Ac3d/Door/Mat001_Tex00
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture door.png
+			}
+		}
+	}
+}
+
+material MusicDoor
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture MusicDoor.jpg
+				filtering trilinear
+			}
+		}
+	}
+}

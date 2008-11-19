@@ -1,0 +1,20 @@
+DoorLockedOverlay
+{
+	zorder 500
+
+	container Panel(DoorLocked)
+	{
+		metrics_mode pixels
+		horz_align right
+		vert_align top
+		left -410
+		top 10
+		width 400
+		height 100
+		material DoorLockedMaterial
+
+	}
+
+}
+
+

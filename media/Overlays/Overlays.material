@@ -1,0 +1,118 @@
+material AreaClearMaterial
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			depth_check off
+
+			texture_unit
+			{
+				texture AreaClear.png
+			}
+		}
+	}
+}
+	
+material AntigravityMaterial
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			depth_check off
+
+			texture_unit
+			{
+				texture Antigravity.png
+			}
+		}
+	}
+}
+	
+material CongratsMaterial
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			depth_check off
+
+			texture_unit
+			{
+				texture Congrats.png
+			}
+		}
+	}
+}
+	
+
+material TitleCardMaterial
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			depth_check off
+
+			texture_unit
+			{
+				texture TitleCard.png
+			}
+		}
+	}
+}
+	
+
+
+
+material NameCardMaterial
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			depth_check off
+
+			texture_unit
+			{
+				texture NameCard.png
+			}
+		}
+	}
+}
+	
+
+
+material DoorLockedMaterial
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			depth_check off
+
+			texture_unit
+			{
+				texture DoorLocked.png
+			}
+		}
+	}
+}
+	
+
+
+
+

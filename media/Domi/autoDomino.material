@@ -1,0 +1,544 @@
+
+material Domino4-waiting
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.500000 0.500000 0.725000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino4-armed
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.200000 0.200000 0.200000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino4-fired
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.000000 0.000000 0.000000 1.000000
+                        diffuse 0.000000 0.000000 0.900000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.900000 1.000000
+                }
+        }
+}
+
+
+
+material Domino4-done
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.000000 0.000000 0.900000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino5-waiting
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.725000 0.725000 0.500000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino5-armed
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.200000 0.200000 0.200000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino5-fired
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.000000 0.000000 0.000000 1.000000
+                        diffuse 0.900000 0.900000 0.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.900000 0.900000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino5-done
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.900000 0.900000 0.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino3-waiting
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.500000 0.725000 0.500000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino3-armed
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.200000 0.200000 0.200000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino3-fired
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.000000 0.000000 0.000000 1.000000
+                        diffuse 0.000000 0.900000 0.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.900000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino3-done
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.000000 0.900000 0.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino6-waiting
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.500000 0.725000 0.725000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino6-armed
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.200000 0.200000 0.200000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino6-fired
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.000000 0.000000 0.000000 1.000000
+                        diffuse 0.000000 0.900000 0.900000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.900000 0.900000 1.000000
+                }
+        }
+}
+
+
+
+material Domino6-done
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.000000 0.900000 0.900000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino0-waiting
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.500000 0.500000 0.500000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino0-armed
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.200000 0.200000 0.200000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino0-fired
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.000000 0.000000 0.000000 1.000000
+                        diffuse 0.000000 0.000000 0.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino0-done
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.000000 0.000000 0.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino1-waiting
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.750000 0.750000 0.750000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino1-armed
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.200000 0.200000 0.200000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino1-fired
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.000000 0.000000 0.000000 1.000000
+                        diffuse 1.000000 1.000000 1.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 1.000000 1.000000 1.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino1-done
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 1.000000 1.000000 1.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino7-waiting
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.725000 0.500000 0.725000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino7-armed
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.200000 0.200000 0.200000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino7-fired
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.000000 0.000000 0.000000 1.000000
+                        diffuse 0.900000 0.000000 0.900000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.900000 0.000000 0.900000 1.000000
+                }
+        }
+}
+
+
+
+material Domino7-done
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.900000 0.000000 0.900000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino2-waiting
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.725000 0.500000 0.500000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino2-armed
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.200000 0.200000 0.200000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino2-fired
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.000000 0.000000 0.000000 1.000000
+                        diffuse 0.900000 0.000000 0.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.900000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+
+
+material Domino2-done
+{
+        receive_shadows on
+        technique
+        {
+                pass
+                {
+                        ambient 0.500000 0.500000 0.500000 1.000000
+                        diffuse 0.900000 0.000000 0.000000 1.000000
+                        specular 1.000000 1.000000 1.000000 1.000000 12.500000
+                        emissive 0.000000 0.000000 0.000000 1.000000
+                }
+        }
+}
+
+

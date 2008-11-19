@@ -1,0 +1,16 @@
+material pdoor
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.200071
+			diffuse 0.296000 0.448000 0.488000 0.200071
+			specular 0.500000 0.500000 0.500000 0.200071 12.500000
+			emissive 0.000000 0.000000 0.000000 0.200071
+			scene_blend alpha_blend
+			depth_write off
+		}
+	}
+}

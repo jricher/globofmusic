@@ -1,0 +1,76 @@
+material thinmat2
+{
+  receive_shadows on
+  technique
+  {
+    pass
+	{
+		ambient 0.500000 0.500000 0.500000 0.650082
+		diffuse 0.800000 0.124661 0.124661 0.650082
+		specular 0.500000 0.500000 0.500000 0.650082 12.500000
+		emissive 0.000000 0.000000 0.000000 0.650082
+		scene_blend alpha_blend
+	}
+  }
+}
+
+material thinmat2waiting
+{
+  receive_shadows on
+  technique
+  {
+    pass
+	{
+		ambient 0.500000 0.500000 0.500000 0.650082
+		diffuse 0.400000 0.000000 0.800000 0.650082
+		specular 0.500000 0.500000 0.500000 0.650082 12.500000
+		emissive 0.000000 0.000000 0.000000 0.650082
+		scene_blend alpha_blend
+	}
+  }
+}
+material thinmat2armed
+{
+  receive_shadows on
+	  technique
+  {
+    pass
+	{
+		ambient 0.500000 0.500000 0.500000 0.650082
+		diffuse 0.800000 0.000000 0.400000 0.250082
+		specular 0.500000 0.500000 0.500000 0.650082 12.500000
+		emissive 0.000000 0.000000 0.000000 0.650082
+		scene_blend alpha_blend
+	}
+  }
+}
+material thinmat2fired
+{
+  receive_shadows on
+	  technique
+  {
+    pass
+	{
+		ambient 0.500000 0.500000 0.500000 0.650082
+		diffuse 1.000000 0.000000 0.500000 0.650082
+		specular 0.500000 0.500000 0.500000 0.650082 12.500000
+		emissive 0.000000 0.000000 0.000000 0.650082
+		scene_blend alpha_blend
+	}
+  }
+}
+material thinmat2done
+{
+  receive_shadows on
+	  technique
+  {
+    pass
+	{
+		ambient 0.500000 0.500000 0.500000 0.650082
+		diffuse 0.600000 0.000000 0.800000 0.650082
+		specular 0.500000 0.500000 0.500000 0.650082 12.500000
+		emissive 0.000000 0.000000 0.000000 0.650082
+		scene_blend alpha_blend
+	}
+  }
+}

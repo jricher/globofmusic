@@ -1,0 +1,20 @@
+CongratsOverlay
+{
+	zorder 500
+
+	container Panel(Congrats)
+	{
+		metrics_mode pixels
+		horz_align center
+		vert_align top
+		left -250
+		top 100
+		width 500
+		height 250
+		material CongratsMaterial
+
+	}
+
+}
+
+

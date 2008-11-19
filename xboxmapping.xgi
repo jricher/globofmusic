@@ -1,0 +1,17 @@
+[Gamepad]
+DevType=5
+LStickDZ=20
+RStickDZ=20
+BThreshold=10
+TThreshold=10
+AThreshold=100
+AxesOn=6
+LAFactor=255
+RAFactor=255
+NButtons=24
+LStickFull=0
+RStickFull=0
+AxesScale=64646464646464
+Layouts=1
+Profile0=151816170708090A0102030405060B0C191A1C1B1F202221
+
