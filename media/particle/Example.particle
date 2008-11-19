@@ -7,8 +7,8 @@ particle_system Examples/njrGreenyNimbus
 	//point_rendering	true
 	// point rendering means size is controlled by material
 	// provide fallback sizes for hardware that doesn't support point sprite
-    particle_width  1
-    particle_height 1
+    particle_width  1 
+    particle_height 1 
 	cull_each       false
     quota           200
     billboard_type  point
