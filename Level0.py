@@ -305,7 +305,7 @@ class Level0(OgreOde.CollisionListener, object):
         
         
         self.loadArea0()
-        #self.loadArea1()
+        self.loadArea1()
         #self.loadArea2()
         #self.loadArea3()
         #print 'Containers:', containers

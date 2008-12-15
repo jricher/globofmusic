@@ -68,12 +68,12 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         self.level = app.level
         self.player = app.player
         self.scn = app.sceneManager
-	self.musicManager = app.musicManager
-	self.overlay = app.overlay
-	self.overlayCountdown = 8
+        self.musicManager = app.musicManager
+        self.overlay = app.overlay
+        self.overlayCountdown = 8
 
         self.lights = app.lights
-	
+        
         app._stepper.setStepListener(self)
         
         self._world = app._world
@@ -416,13 +416,13 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
             #print self.playerBody.getTorque()
             #print self.xAxis, ",", self.yAxis
         
-		
+                
             #map controller axis to camera relative controls
             ##i'm probably overdoing the normalization a little bit here, just making sure we get the right values
 
             #controllerDirection = ogre.Vector3(self.xAxis, 0, self.yAxis);
             #controllerDirection.normalise();
-		
+                
             forward = ogre.Vector3(self.camera.getDirection().x, 0, self.camera.getDirection().z); 
             #forward.normalise();
             
@@ -490,7 +490,7 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
                 # project the current linear velocity along our jump vector
                 proj = curLinear.dotProduct(jv) * jv
 
-            	#print proj.squaredLength()
+                #print proj.squaredLength()
 
             
                 if (proj + jv).squaredLength() < (22 * 22):
@@ -695,13 +695,34 @@ class GomApplication(sf.Application, object):
         #for a in l.getAnimableValueNames():
         #    print "  **", a
         
-        l.setType (ogre.Light.LT_DIRECTIONAL)
-        dirn = ogre.Vector3(0.5, -1, 0.5)
-        dirn.normalise()
-        l.setDirection(dirn)
-        l.setDiffuseColour(ogre.ColourValue(1.0, 1.0, 1.0))
+        l.setType (ogre.Light.LT_POINT)
+        #dirn = ogre.Vector3(0.5, -1, 0.5)
+        #dirn.normalise()
+        #l.setDirection(dirn)
+        pos = ogre.Vector3(300, 900, -300)
+        l.setPosition(pos)
+        l.setDiffuseColour(ogre.ColourValue(0.8, 0.8, 0.8))
         l.setSpecularColour(ogre.ColourValue(1.0, 1.0, 1.0))
         
+        #create a secondary dimmer light
+        l = self.sceneManager.createLight('SecondLight')
+
+        #print '  >>', dir(l.getAnimableValueNames())
+        #
+        #for a in l.getAnimableValueNames():
+        #    print "  **", a
+        
+        l.setType (ogre.Light.LT_POINT)
+        #dirn = ogre.Vector3(0.5, -1, 0.5)
+        #dirn.normalise()
+        #l.setDirection(dirn)
+        pos = ogre.Vector3(300, 200, 300)
+        l.setPosition(pos)
+        l.setDiffuseColour(ogre.ColourValue(0.4, 0.4, 0.4))
+        l.setSpecularColour(ogre.ColourValue(0.2, 0.2, 0.2))
+        # effectively turn off shadows for this one
+        l.setShadowFarDistance(0.01)
+
         if SWEET_LIGHTS:
             # Create pulsing lights
             dirn = ogre.Vector3(0.5, -0.75, 0.5)
