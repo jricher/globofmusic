@@ -105,7 +105,7 @@ class Level0(OgreOde.CollisionListener, object):
 
         scn = app.sceneManager
 
-        scn.setAmbientLight (ogre.ColourValue(0.2, 0.2, 0.2))
+        scn.setAmbientLight (ogre.ColourValue(0.2, 0.2, 0.25))
         
         # give us a skybox
         scn.setSkyBox(True, 'RedSkyBox')
@@ -114,24 +114,9 @@ class Level0(OgreOde.CollisionListener, object):
         # each area is 100x100 units
         # add two rooms to either end
 
-        # start room
-            
-        c = Arena('StartRoom', 0)
-        containers[c.id] = c
-        c.ent = scn.createEntity('StartRoom', 'ArenaEnd.mesh')
-        c.node = self.rootNode.createChildSceneNode('StartRoom')
-        c.node.setPosition(ogre.Vector3(0, 0, -75.01))
-        c.node.setOrientation(ogre.Quaternion(ogre.Degree(180), ogre.Vector3().UNIT_Y))
-        c.node.attachObject(c.ent)
-        c.ent.setCastShadows(False)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-
-        c.geom.setUserData(c.id)
-
-
+        
+        self.createStartRoom(self.rootNode, ogre.Vector3(0, -2, -76.01), scn)
+        
         # end room
         
         c = Arena('EndRoom', 5)
@@ -193,12 +178,39 @@ class Level0(OgreOde.CollisionListener, object):
         #Starting room Arrow hint
         self.startingArrow(-95)
         
+        
+        
+        #self.loadArea0()
+        #self.loadArea1()
+        #self.loadArea2()
+        #self.loadArea3()
+        #print 'Containers:', containers
+
+
+    def createStartRoom(self, root, offset, scn):
+        # start room
+
+        c = Arena('StartRoom', 0)
+        containers[c.id] = c
+        c.ent = scn.createEntity('StartRoom', 'ArenaEnd.mesh')
+        c.node = root.createChildSceneNode('StartRoom')
+        c.node.setPosition(offset)
+        c.node.setOrientation(ogre.Quaternion(ogre.Degree(180), ogre.Vector3().UNIT_Y)) #flip it around
+        c.node.attachObject(c.ent)
+        c.ent.setCastShadows(False)
+
+        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
+        c.ent.setUserObject(c.geom)
+
+        c.geom.setUserData(c.id)
+        
         #Starting Room platform
         key = MultiKey()
         c = Platform(materialName = 'platform0-')
         containers[c.id] = c
         c.ent = scn.createEntity('tilt_plat0', 'platform.mesh')
-        c.node = self.rootNode.createChildSceneNode('tilt_platform0')
+        c.node = root.createChildSceneNode('tilt_platform0')
         c.node.attachObject(c.ent)
 
         c.ent.setCastShadows(True)
@@ -215,11 +227,11 @@ class Level0(OgreOde.CollisionListener, object):
         c.geom.setBody(c.body)
         c.ent.setUserObject(c.geom)
         
-        c.body.setPosition(ogre.Vector3(0, 2, -85))
+        c.body.setPosition(ogre.Vector3(0, 2, -10) + offset)
 
         c.joint = OgreOde.BallJoint(self._world)
         c.joint.attach(c.body)
-        c.joint.setAnchor(ogre.Vector3(0, 2, -85))
+        c.joint.setAnchor(ogre.Vector3(0, 2, -10) + offset)
 
         c.sound = self.sounds['key-1']
         #c.sound = random.choice(self.sounds.values())
@@ -240,10 +252,10 @@ class Level0(OgreOde.CollisionListener, object):
         c.ent = scn.createEntity("Left_Door","door.mesh")
         c.ent.setCastShadows(True)
 
-        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
+        c.node = root.createChildSceneNode(c.ent.getName())
 
         c.node.attachObject(c.ent)
-        c.node.setPosition(4,2.5,-50)
+        c.node.setPosition(ogre.Vector3(4,2.5,25) + offset)
         c.node.setScale(4,1,2)
 
         ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
@@ -254,7 +266,7 @@ class Level0(OgreOde.CollisionListener, object):
         c.joint = OgreOde.HingeJoint(self._world)
         c.joint.attach(c.body)
         c.joint.setAxis(ogre.Vector3().UNIT_Y)
-        c.joint.setAnchor(ogre.Vector3(7.5,2.5,-50))
+        c.joint.setAnchor(ogre.Vector3(7.5,2.5,25) + offset)
         
         # create fixed joint to form a lock
         l = OgreOde.FixedJoint(self._world)
@@ -275,10 +287,10 @@ class Level0(OgreOde.CollisionListener, object):
         #c.ent.setNormaliseNormals(True)
         c.ent.setCastShadows(True)
 
-        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
+        c.node = root.createChildSceneNode(c.ent.getName())
 
         c.node.attachObject(c.ent)
-        c.node.setPosition(-4.1,2.5,-50)
+        c.node.setPosition(ogre.Vector3(-4.1,2.5,25) + offset)
         c.node.setScale(4,1,2)
         ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
         c.body = ei.createSingleDynamicBox(20.0,self._world, self._space)
@@ -288,7 +300,7 @@ class Level0(OgreOde.CollisionListener, object):
         c.joint = OgreOde.HingeJoint(self._world)
         c.joint.attach(c.body)
         c.joint.setAxis(ogre.Vector3().UNIT_Y)
-        c.joint.setAnchor(ogre.Vector3(-7.6,2.5,-50))
+        c.joint.setAnchor(ogre.Vector3(-7.6,2.5,25) + offset)
         
         c.sound = self.sounds[random.choice(self.doorSounds)]
         
@@ -302,14 +314,9 @@ class Level0(OgreOde.CollisionListener, object):
     
         key.doors.append(c)
         
-        
-        
-        self.loadArea0()
-        self.loadArea1()
-        #self.loadArea2()
-        #self.loadArea3()
-        #print 'Containers:', containers
 
+
+        
 
     def loadArea0(self):
         scn = self.rootNode.getCreator()
