@@ -115,27 +115,9 @@ class Level0(OgreOde.CollisionListener, object):
         # add two rooms to either end
 
         
-        self.createStartRoom(self.rootNode, ogre.Vector3(0, -2, -76.01), scn)
-        
-        # end room
-        
-        c = Arena('EndRoom', 5)
-        containers[c.id] = c
-        c.ent = scn.createEntity('EndRoom', 'ArenaEnd.mesh')
-        c.node = self.rootNode.createChildSceneNode('EndRoom')
-        c.node.setPosition(ogre.Vector3(0, 0, 375.01))
-        c.node.attachObject(c.ent)
-        c.ent.setCastShadows(False)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-
-        c.geom.setUserData(c.id)
-
-        
         # store up calculated positions while we're at it
-        for i in range(0, 6):
+        rooms = 2
+        for i in range(0, rooms + 2):
             #self.cameraPositions.append(ogre.Vector3(10, 35, -60 + 100 * i)) # front view
             #self.cameraPositions.append(ogre.Vector3(-100, 35, 0 + 100 * i))  # side view
             #self.cameraPositions.append(ogre.Vector3(-55, 45, -100 + 100 * i))  # side view
@@ -145,40 +127,26 @@ class Level0(OgreOde.CollisionListener, object):
             # JR: CHANGE THIS
             #self.cameraPositions.append(ogre.Vector3(10, 10, 70 + 100 * i)) # front view
 
-            if i > 0 and i < 5:
+            if i > 0 and i < rooms + 1:
                 self.playerStarts.append(ogre.Vector3(0, 4, -145 + 100 * i))
 
-                # set up the arena floors
-                c = Arena('arena%d' % (i - 1), i)
-                containers[c.id] = c
-                c.ent = scn.createEntity('arena%d' % (i - 1), 'Arena.mesh')
-                c.node = self.rootNode.createChildSceneNode('arena%d' % (i - 1))
-                c.node.setPosition(ogre.Vector3(0, 0, -100 + i * 100))
-                c.node.attachObject(c.ent)
-
-                c.ent.setCastShadows(False)
-                
-                # set the floor color properly
-                sub = c.ent.getSubEntity(0)
-                sub.materialName = 'Floor%d' % (i - 1)
-                
-                # copied from SimpleScenes_TriMesh, there's probably a much more efficient way to do this
-                ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-                c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-                c.ent.setUserObject(c.geom)
-                
-                c.geom.setUserData(c.id)
+                self.makeCrate("crate " + str(i), self.rootNode, ogre.Vector3(0, 2, -100 + 100 * i), scn)
+                self.makeArena(self.rootNode, ogre.Vector3(0, 0, -100 + 100 * i), scn, i)
             elif i == 0:
                 # first room
                 self.playerStarts.append(ogre.Vector3(0, 4, -75 + 100 * i))
-            elif i == 5:
+                self.makeStartRoom(self.rootNode, ogre.Vector3(0, 0, -75.01 + 100 * i), scn)
+            elif i == rooms + 1:
                 # final room
                 self.playerStarts.append(ogre.Vector3(0, 4, -125 + 100 * i))
+                self.makeEndRoom(self.rootNode, ogre.Vector3(0, 0, 25.01 + 100 * i), scn)
 
         #Starting room Arrow hint
         self.startingArrow(-95)
-        
-        
+        (leftDoor, rightDoor) = self.makeSwingingDoors(self.rootNode, ogre.Vector3(0, 0, 25), scn)
+
+
+
         
         #self.loadArea0()
         #self.loadArea1()
@@ -186,8 +154,57 @@ class Level0(OgreOde.CollisionListener, object):
         #self.loadArea3()
         #print 'Containers:', containers
 
+    def makeArena(self, root, offset, scn, i):
+        # set up the arena floors
+        c = Arena('arena%d' % (i - 1), i)
+        containers[c.id] = c
+        c.ent = scn.createEntity('arena%d' % (i - 1), 'Arena.mesh')
+        c.node = self.rootNode.createChildSceneNode('arena%d' % (i - 1))
+        c.node.setPosition(ogre.Vector3() + offset)
+        c.node.attachObject(c.ent)
 
-    def createStartRoom(self, root, offset, scn):
+        c.ent.setCastShadows(False)
+        
+        # set the floor color properly
+        sub = c.ent.getSubEntity(0)
+        sub.materialName = 'Floor%d' % ((i - 1 % 4))
+        
+        # copied from SimpleScenes_TriMesh, there's probably a much more efficient way to do this
+        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
+        c.ent.setUserObject(c.geom)
+        
+        c.geom.setUserData(c.id)
+
+    def makeCrate(self, name, root, position, scn):
+        c = Platform(name)
+        containers[c.id] = c
+        c.ent = scn.createEntity(name, "Cube.mesh")
+        #c.ent.setNormaliseNormals(True)
+        c.ent.setCastShadows(True)
+        #c.ent.setScale(4, 4, 4)
+
+        #sub = c.ent.getSubEntity(0)
+        #sub.materialName = 'Ac3d/Door/Mat001_Tex00' # look like a door
+
+        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
+        c.node.attachObject(c.ent)
+
+        c.node.setPosition(position)
+
+        ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+        c.body = ei.createSingleDynamicBox(0.2,self._world, self._space)
+        #c.body.setDamping(2,2)
+        c.body.sleep() # put the doors to sleep until we need them
+        c.geom = c.body.getGeometry(0)
+
+        c.sound = self.sounds[random.choice(self.doorSounds)]
+        c.geom.setUserData(c.id)
+        
+        return c
+
+
+    def makeStartRoom(self, root, offset, scn):
         # start room
 
         c = Arena('StartRoom', 0)
@@ -245,11 +262,39 @@ class Level0(OgreOde.CollisionListener, object):
         c.key = key
         key.platforms.append(c)
         containers[c.id] = c
+
+        (leftDoor, rightDoor) = self.makeSwingingDoors(root, offset, scn)
+        #leftDoor.lock(self._world)
+        rightDoor.lock(self._world)
+        #key.doors.append(leftDoor)
+        key.doors.append(rightDoor)
+        
+
+    def makeEndRoom(self, root, offset, scn):
+        c = Arena('EndRoom', 5)
+        containers[c.id] = c
+        c.ent = scn.createEntity('EndRoom', 'ArenaEnd.mesh')
+        c.node = self.rootNode.createChildSceneNode('EndRoom')
+        c.node.setPosition(ogre.Vector3() + offset)
+        c.node.attachObject(c.ent)
+        c.ent.setCastShadows(False)
+
+        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
+        c.ent.setUserObject(c.geom)
+
+        c.geom.setUserData(c.id)
+
+        
+
+    def makeSwingingDoors(self, root, offset, scn):
+        doors = []
+
         
         ## Create a door hinged on the left hand side
         c = Door('left door')
         containers[c.id] = c
-        c.ent = scn.createEntity("Left_Door","door.mesh")
+        c.ent = scn.createEntity("Left_Door:" + str(offset),"door.mesh")
         c.ent.setCastShadows(True)
 
         c.node = root.createChildSceneNode(c.ent.getName())
@@ -268,22 +313,18 @@ class Level0(OgreOde.CollisionListener, object):
         c.joint.setAxis(ogre.Vector3().UNIT_Y)
         c.joint.setAnchor(ogre.Vector3(7.5,2.5,25) + offset)
         
-        # create fixed joint to form a lock
-        l = OgreOde.FixedJoint(self._world)
-        l.attach(c.body)
-        c.locks.append(l)
-        c.locked = True
-        
         c.sound = self.sounds[random.choice(self.doorSounds)]
 
         c.geom.setUserData(c.id)
 
-        key.doors.append(c)
+        doors.append(c)
+
         
+
         ## Create a door hinged on the right hand side
         c = Door('right door')
         containers[c.id] = c
-        c.ent = scn.createEntity("Right_Door","door.mesh")
+        c.ent = scn.createEntity("Right_Door:" + str(offset),"door.mesh")
         #c.ent.setNormaliseNormals(True)
         c.ent.setCastShadows(True)
 
@@ -304,718 +345,14 @@ class Level0(OgreOde.CollisionListener, object):
         
         c.sound = self.sounds[random.choice(self.doorSounds)]
         
-        # create fixed joint to form a lock
-        l = OgreOde.FixedJoint(self._world)
-        l.attach(c.body)
-        c.locks.append(l)
-        c.locked = True
         
         c.geom.setUserData(c.id)
+        
+        doors.append(c)
+
+
+        return doors
     
-        key.doors.append(c)
-        
-
-
-        
-
-    def loadArea0(self):
-        scn = self.rootNode.getCreator()
-        offset = 0
-
-        # create a key
-        key = MultiKey('Area0')
-        key.unlockCallback = self.areaClear
-
-        ##Create a platform
-        c = Platform(materialName = 'platform0-')
-        containers[c.id] = c
-        c.ent = scn.createEntity('plat0', 'platform.mesh')
-        c.node = self.rootNode.createChildSceneNode('platform')
-        c.node.setPosition(ogre.Vector3(0, 0.09, offset - 30))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        # set the floor color properly
-        #sub = c.ent.getSubEntity(0)
-        #sub.materialName = 'plat0'
-            
-        # copied from SimpleScenes_TriMesh, there's probably a much more efficient way to do this
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['key-0']
-        #c.sound = random.choice(self.sounds.values())
-        c.quant = 8
-
-        # set the initial material
-        c.setMaterial()
-
-        c.key = key
-        key.platforms.append(c)
-
-        ##Create dynamic platform    
-
-        c = Platform(materialName = 'platform0-')
-        containers[c.id] = c
-        c.ent = scn.createEntity('tilt_plat', 'platform.mesh')
-        c.node = self.rootNode.createChildSceneNode('tilt_platform')
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-
-        c.body = OgreOde.Body(self._world, 'OgreOde::Body_' + c.node.getName())
-        c.node.attachObject(c.body)
-        mass = OgreOde.BoxMass (20.0, ei.getSize())
-        mass.setDensity(5.0, ei.getSize())
-        c.body.setMass(mass)
-        
-        c.geom.setBody(c.body)
-        c.ent.setUserObject(c.geom)
-        
-        c.body.setPosition(ogre.Vector3(40, 2, offset))
-
-        c.joint = OgreOde.BallJoint(self._world)
-        c.joint.attach(c.body)
-        c.joint.setAnchor(ogre.Vector3(40, 2, offset))
-
-        c.sound = self.sounds['key-1']
-        #c.sound = random.choice(self.sounds.values())
-        c.quant = 8
-
-        # set the initial material
-        c.setMaterial()
-
-        c.geom.setUserData(c.id)
-
-        c.key = key
-        key.platforms.append(c)
-        
-        ##end dynamic platform
-
-
-
-
-        # [Jumping Platforms
-        # [Platform 1
-        c = Platform(materialName = 'plat1-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('plat1', 'plat1.mesh')
-        c.node = self.rootNode.createChildSceneNode('plat1')
-        c.node.setPosition(ogre.Vector3(0, 3, offset))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['tabla-0']
-
-        c.setMaterial()
-        # Platform 1]
-
-        # [Platform 2
-        c = Platform(materialName = 'plat1-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('plat2', 'plat1.mesh')
-        c.node = self.rootNode.createChildSceneNode('plat2')
-        c.node.setPosition(ogre.Vector3(-2, 6, offset + 4))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['tabla-1']
-
-        c.setMaterial()
-        # Platform 2]
-
-        # [Platform 3
-        c = Platform(materialName = 'plat1-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('plat3', 'plat2.mesh')
-        c.node = self.rootNode.createChildSceneNode('plat3')
-        c.node.setPosition(ogre.Vector3(-4, 9, offset + 8))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['tabla-2']
-
-        c.setMaterial()
-        # Platform 3]
-
-        # [Platform 4
-        c = Platform(materialName = 'plat1-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('plat4', 'plat2.mesh')
-        c.node = self.rootNode.createChildSceneNode('plat4')
-        c.node.setPosition(ogre.Vector3(-4, 12, offset + 12))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['tabla-3']
-
-        c.setMaterial()
-        # Platform 4]
-
-        # [Platform 5
-        c = Platform(materialName = 'plat1-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('plat5', 'plat3.mesh')
-        c.node = self.rootNode.createChildSceneNode('plat5')
-        c.node.setPosition(ogre.Vector3(-2, 15, offset + 16))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['tabla-4']
-
-        c.setMaterial()
-        # Platform 5]
-
-        # [Key Platform
-        c = Platform(materialName = 'platform0-')
-        containers[c.id] = c
-        c.ent = scn.createEntity('keyplat2', 'platform.mesh')
-        c.node = self.rootNode.createChildSceneNode('keyplat2')
-        c.node.setPosition(ogre.Vector3(0, 18, offset + 20))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['key-2']
-        c.quant = 8
-
-        c.setMaterial()
-        
-        c.key = key
-        key.platforms.append(c)
-        # Key Platform]
-        # Jumping Platforms]
-
-
-        # [Ramp
-        # [Ramp 1
-        c = Platform(materialName = 'LRamp-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('Ramp_Start', 'RampStart.mesh')
-        c.node = self.rootNode.createChildSceneNode('rampstart')
-        c.node.setOrientation(ogre.Quaternion(ogre.Degree(175), ogre.Vector3().UNIT_Y))
-        c.node.setPosition(ogre.Vector3(-27, 2.65, offset - 28.5))        
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['neutron-0']
-
-        c.setMaterial()
-        # Ramp 1]
-
-        # [Ramp 2
-        c = Platform(materialName = 'LRamp-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('Ramp_2', 'ramp2.mesh')
-        c.node = self.rootNode.createChildSceneNode('ramp2')
-        c.node.setScale(ogre.Vector3(1.0, 1.0, 0.96))
-        c.node.setOrientation(ogre.Quaternion(ogre.Degree(179.5), ogre.Vector3().UNIT_Y))
-        c.node.setPosition(ogre.Vector3(-41.0, 4.45, offset + 1.7))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['neutron-1']
-
-        c.setMaterial()
-        # Ramp 2]
-
-        # [Ramp 3
-        c = Platform(materialName = 'LRamp-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('Ramp_3', 'ramp3.mesh')
-        c.node = self.rootNode.createChildSceneNode('ramp3')
-        c.node.setScale(ogre.Vector3(1.0, 1.0, 1.1))
-        c.node.setOrientation(ogre.Quaternion(ogre.Degree(184.5), ogre.Vector3().UNIT_Y))
-        c.node.setPosition(ogre.Vector3(-32.4, 8.125, offset + 30.75))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['neutron-0']
-
-        c.setMaterial()
-        # Ramp 3]
-
-        # [Ramp 4
-        c = Platform(materialName = 'LRamp-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('Ramp_4', 'ramp4.mesh')
-        c.node = self.rootNode.createChildSceneNode('ramp4')
-        c.node.setScale(ogre.Vector3(0.93, 1.0, 1.0))
-        c.node.setOrientation(ogre.Quaternion(ogre.Degree(177.5), ogre.Vector3().UNIT_Y))
-        c.node.setPosition(ogre.Vector3(0, 9.65, offset + 42.507))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['neutron-1']
-
-        c.setMaterial()
-        # Ramp4]
-
-        # [Ramp 5
-        c = Platform(materialName = 'LRamp-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('Ramp_5', 'ramp5.mesh')
-        c.node = self.rootNode.createChildSceneNode('ramp5')
-        c.node.setOrientation(ogre.Quaternion(ogre.Degree(177.5), ogre.Vector3().UNIT_Y))
-        c.node.setPosition(ogre.Vector3(32, 11.485, offset + 34.3))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['neutron-0']
-
-        c.setMaterial()
-        # Ramp5]
-
-        # [Ramp 6
-        c = Platform(materialName = 'LRamp-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('Ramp_6', 'ramp6.mesh')
-        c.node = self.rootNode.createChildSceneNode('ramp6')
-        c.node.setOrientation(ogre.Quaternion(ogre.Degree(179.5), ogre.Vector3().UNIT_Y))
-        c.node.setPosition(ogre.Vector3(41, 12.55, offset + 0.4))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['neutron-1']
-
-        c.setMaterial()
-        # Ramp6]
-
-        # [Ramp 7
-        c = Platform(materialName = 'LRamp-')
-        containers[c.id] = c
-        self.ramps.append(c.id)
-        c.ent = scn.createEntity('Ramp_7', 'ramp7.mesh')
-        c.node = self.rootNode.createChildSceneNode('ramp7')
-        c.node.setOrientation(ogre.Quaternion(ogre.Degree(179.4), ogre.Vector3().UNIT_Y))
-        c.node.setPosition(ogre.Vector3(32.3, 12.8, offset - 33))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['neutron-0']
-
-        c.setMaterial()
-        # Ramp7]
-
-        # [Ramp 8
-        c = Platform(materialName = 'LRamp-')
-        containers[c.id] = c
-        #self.ramps.append(c.id)
-        c.ent = scn.createEntity('Ramp_8', 'ramp8.mesh')
-        c.node = self.rootNode.createChildSceneNode('ramp8')
-        c.node.setOrientation(ogre.Quaternion(ogre.Degree(179.8), ogre.Vector3().UNIT_Y))
-        c.node.setPosition(ogre.Vector3(14.5, 14.1, offset - 36.9))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['neutron-1']
-
-        c.setMaterial()
-        # Ramp8]
-
-        # [Key Platform
-        c = Platform(materialName = 'platform0-')
-        containers[c.id] = c
-        c.ent = scn.createEntity('keyplat3', 'platform.mesh')
-        c.node = self.rootNode.createChildSceneNode('keyplat3')
-        c.node.setPosition(ogre.Vector3(14.5, 15, offset - 35.7))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['key-3']
-        c.quant = 8
-
-        c.setMaterial()
-        
-        c.key = key
-        key.platforms.append(c)
-        # Key Platform]
-        # Ramp]
-        
-        
-        #Need door here
-         #Create the glass exit door
-        c = Door('r Door')
-        containers[c.id] = c
-        c.ent = scn.createEntity("r_Door","door.mesh")
-        #c.ent.setNormaliseNormals(True)
-        c.ent.getSubEntity(0).materialName = "MusicDoor"
-        c.ent.setCastShadows(True)
-
-        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
-
-        c.node.attachObject(c.ent)
-        c.node.setPosition(0,2.8,offset + 48)
-        c.node.setScale(8,1,1)
-        
-        ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-        c.body = ei.createSingleDynamicBox(200.0,self._world, self._space)
-        c.body.setDamping(200,200)
-        c.geom = c.body.getGeometry(0)
-
-        c.joint = OgreOde.HingeJoint(self._world)
-        c.joint.attach(c.body)
-        c.joint.setAxis(ogre.Vector3().UNIT_Y)
-        c.joint.setAnchor(ogre.Vector3(0,0,offset + 48))
-        
-        c.sound = self.sounds[random.choice(self.doorSounds)]
-        
-        l = OgreOde.FixedJoint(self._world)
-        l.attach(c.body)
-        c.locks.append(l)
-        c.locked = True
-        
-        c.geom.setUserData(c.id)
-        
-        key.doors.append(c)
-        
-        
-        
-
-    def loadArea1(self):
-        offset = 100
-        # The offset value tells you which sublevel to draw everything on
-        #print self.cameraPositions
-        #print self.cameraPositions[2]
-        #self.cameraPositions[2] = ogre.Vector3(-35, 45, offset - 50)
-        
-        #I want my antigravity back :(
-        #self.player.powerups.append("gravity") # too bad
-        self.nrackliffe_Dominoes(offset)
-        
-    def loadArea2(self):
-        scn = self.rootNode.getCreator()
-        offset = 200
-        
-        key = MultiKey('Area2')
-        key.unlockCallback = self.areaClear
-        
-        self.nextPlatformSound=0
-        
-        self.WobblyPlatforms = []
-        
-        def plRamp(self, x, y, z, roty):
-            
-            name = 'plramp_%f_%f_%f' % (x,y,z)
-            c = Platform(name, materialName = 'thinmat3')
-            self.WobblyPlatforms.append(c.id)
-            containers[c.id] = c
-            c.ent = scn.createEntity(name, 'ramp.mesh')
-            c.node = self.rootNode.createChildSceneNode(name)
-            
-            c.node.setPosition(ogre.Vector3(x, y, z+offset))
-            c.node.rotate(ogre.Vector3(0,1,0), ogre.Degree(roty))
-            
-            #scale ever so slightly so that ramps can be put next to each other without collisions
-            c.node.setScale(0.9999,0.9999,0.9999)
-            
-            c.node.attachObject(c.ent)
-
-            c.ent.setCastShadows(True)
-
-            ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-            c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-            
-            c.ent.setUserObject(c.geom)
-            c.geom.setUserData(c.id)
-            if self.nextPlatformSound > 5:
-                self.nextPlatformSound=0
-            c.sound = self.sounds['tabla-%d' % self.nextPlatformSound]
-            self.nextPlatformSound+=1
-
-            
-            c.setMaterial()
-            
-        def plDynamicPlatform(self, x, y, z, roty):
-            name = 'plDynamicPlatform_%f_%f_%f' % (x,y,z)
-            c = Platform(name, materialName = 'thinmat2')
-            self.WobblyPlatforms.append(c.id)
-            containers[c.id] = c
-            c.ent = scn.createEntity(name, 'thinplat.mesh')
-            c.node = self.rootNode.createChildSceneNode(name)
-            c.ent.setCastShadows(False)
-            c.node.setPosition(ogre.Vector3(x, y, z+offset))
-
-            quat = ogre.Quaternion(ogre.Degree(roty),ogre.Vector3().UNIT_Y)
-            c.node.setOrientation(quat)
-            
-            #scale ever so slightly so that platforms can be put next to each other without collisions
-            c.node.setScale(0.9999,0.9999,0.9999)
-
-            c.node.attachObject(c.ent)
-            c.startPosition = (x,y,z+offset)
-            c.node.setPosition(c.startPosition)
-            quat = ogre.Quaternion(ogre.Degree(roty),ogre.Vector3().UNIT_Y)
-            c.node.setOrientation(quat)
-            ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-            
-            c.body = ei.createSingleDynamicBox(20.0,self._world, self._space)
-            c.geom = c.body.getGeometry(0)
-            c.joint = OgreOde.HingeJoint(self._world)
-            c.joint.attach(c.body)
-            c.joint.setAxis(quat.zAxis())
-            c.joint.setAnchor(ogre.Vector3(x,y,z+offset))
-
-            c.geom.setBody(c.body)
-            c.ent.setUserObject(c.geom)
-            
-            c.geom.setUserData(c.id)
-            
-            c.sound = self.sounds['wurl-%d' % random.randint(0, 3)]
-            
-            c.setMaterial()
-
-
-        def plStaticPlatform(self, x, y, z, roty):
-            name = 'plStaticPlatform_%f_%f_%f' % (x,y,z)
-            c = Platform(name, materialName = 'thinmat3')
-            self.WobblyPlatforms.append(c.id)
-            containers[c.id] = c
-            c.ent = scn.createEntity(name, 'thinplat.mesh')
-            c.node = self.rootNode.createChildSceneNode(name)
-            c.ent.setCastShadows(True)
-            c.node.setPosition(ogre.Vector3(x, y, z+offset))
-
-            quat = ogre.Quaternion(ogre.Degree(roty),ogre.Vector3().UNIT_Y)
-            c.node.setOrientation(quat)
-            #scale ever so slightly so that platforms can be put next to each other without collisions
-            c.node.setScale(0.9999,0.9999,0.9999)
-
-            c.node.attachObject(c.ent)
-            c.startPosition = (x,y,z+offset)
-            c.node.setPosition(c.startPosition)
-            quat = ogre.Quaternion(ogre.Degree(roty),ogre.Vector3().UNIT_Y)
-            c.node.setOrientation(quat)
-            ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-            c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-            
-            c.ent.setUserObject(c.geom)
-            c.geom.setUserData(c.id)
-            
-            c.sound = self.sounds['bowen-%d' % random.randint(0, 3)]
-            
-            c.setMaterial()
-
-
-        def plKeyPlatform(x, y, z, k):
-            name = 'plkeyplat_%f_%f_%f' % (x,y,z)
-            c = Platform(materialName = 'platform0-')
-            containers[c.id] = c
-            c.ent = scn.createEntity(name, 'platform.mesh')
-            c.node = self.rootNode.createChildSceneNode(name)
-            c.node.setPosition(ogre.Vector3(x, y, z+offset))
-            c.node.attachObject(c.ent)
-            
-            #make key platform a bit larger            
-            c.node.setScale(1.55,1.55,1.55)
-            
-            c.ent.setCastShadows(True)
-            
-            ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-            c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-            c.ent.setUserObject(c.geom)
-            c.geom.setUserData(c.id)
-
-            c.sound = self.sounds['key-%d' % k]
-            c.quant = 8
-
-            c.setMaterial()
-
-            c.key = key
-            key.platforms.append(c)
-
-        def makeWobblyPlatform(self, x, y, z, roty, seperation):
-            plDynamicPlatform(self, x, y, z, roty)
-            plStaticPlatform(self, x, y-seperation, z, roty)
-        
-        ##Setup area
-        #North platforms 
-        for i in range(15):
-            plRamp(self, 30,0.5+i,-25+i, 0.0)
-        
-        for i in range(20):
-            makeWobblyPlatform(self, 30, 15, -10+i, 0.0, 2.0)
-            
-        plKeyPlatform(30.5, 14.5, 15, 0)
-        
-        #East platforms
-        for i in range(5):
-            plRamp(self, 25-i,14-i, 15, 90)
-            
-        for i in range(15):
-            makeWobblyPlatform(self, 20-i, 10, 15, 90, 2.0)
-            
-        for i in range(5):
-            plRamp(self, 5-i,10+i, 15, 270)
-
-        for i in range(5):
-            plRamp(self, 0-i, 14-i, 15, 90)
-        
-        for i in range(15):
-            makeWobblyPlatform(self, -5-i, 10, 15, 90, 2.0)
-            
-        plKeyPlatform(-25, 10, 15, 1)
-        
-        #South Platforms
-        for i in range(10):
-            makeWobblyPlatform(self, -25-i, 10, 9-i, 0, 2.0)
-            
-        for i in range(10):
-            makeWobblyPlatform(self,  -35+i, 10 , -1-i, 0, 2.0)
-            
-        plKeyPlatform(-25, 10, -16, 2)
-        
-        #Center Platforms
-        for i in range(10):
-            plRamp(self, -20+i , 10+i,-16, 90)
-
-        #make the ones at the end a little easier we wouldn't want the player to fall off now... would we?
-        for i in range(20):
-            makeWobblyPlatform(self,  -10+i, 19 , -16, 90, 1.5)
-        
-        #drop down a bit to the platform
-        plKeyPlatform( 15, 17, -16, 3)
-        
-        #Create the glass exit door
-        c = Door('p Door')
-        containers[c.id] = c
-        c.ent = scn.createEntity("p_Door","pdoor0.mesh")
-        #c.ent.setNormaliseNormals(True)
-        c.ent.setCastShadows(True)
-
-        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
-
-        c.node.attachObject(c.ent)
-        c.node.setPosition(0,2.8,47+offset)
-        
-        c.ent.getSubEntity(0).materialName = 'thinmat2'
-        ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-        c.body = ei.createSingleDynamicBox(20.0,self._world, self._space)
-        c.body.setDamping(0,20)
-        c.geom = c.body.getGeometry(0)
-
-        c.joint = OgreOde.HingeJoint(self._world)
-        c.joint.attach(c.body)
-        c.joint.setAxis(ogre.Vector3().UNIT_X)
-        c.joint.setAnchor(ogre.Vector3(0,5,47+offset))
-        
-        c.sound = self.sounds[random.choice(self.doorSounds)]
-        
-        l = OgreOde.FixedJoint(self._world)
-        l.attach(c.body)
-        c.locks.append(l)
-        c.locked = True
-        
-        c.geom.setUserData(c.id)
-        
-        key.doors.append(c)
-        
     def loadArea3(self):
         scn = self.rootNode.getCreator()
         offset = 300
@@ -1610,7 +947,7 @@ class Level0(OgreOde.CollisionListener, object):
             try: self.particles["StartArrow"] #check to see if particles exist
             except KeyError: #if they don't
                 #player has jumped a wall, CHEATER!
-                self.player.warpTo = (self.playerStarts[area-1])
+                #self.player.warpTo = (self.playerStarts[area-1])
                 return 'CHEATER'
             else: #if they do
                 self.particles["StartArrow"].particleSystem.removeAllEmitters()

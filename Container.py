@@ -8,6 +8,9 @@
 ##
 
 import ogre.renderer.OGRE as ogre
+import ogre.physics.OgreOde as OgreOde
+import ogre.sound.OgreAL as OgreAL
+import ogre.io.OIS as OIS
 
 # A set of generic containers to hold OGRE, ODE, and OpenAL entities in one place
 
@@ -272,7 +275,7 @@ class Door(Container):
     def __init__(self, name):
         Container.__init__(self, name)
         self.locks = []
-        self.locked = True
+        self.locked = False
 
     def __del__(self):
         if not Container:
@@ -281,6 +284,13 @@ class Door(Container):
         del self.locks
         del self.locked
 
+    def lock(self, _world):
+        # create fixed joint to form a lock
+        l = OgreOde.FixedJoint(_world)
+        l.attach(self.body)
+        self.locks.append(l)
+        self.locked = True
+        
     def unlock(self):
         '''
         once unlocked, cant be re-locked
