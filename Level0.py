@@ -116,7 +116,7 @@ class Level0(OgreOde.CollisionListener, object):
 
         
         # store up calculated positions while we're at it
-        rooms = 2
+        rooms = 12
         for i in range(0, rooms + 2):
             #self.cameraPositions.append(ogre.Vector3(10, 35, -60 + 100 * i)) # front view
             #self.cameraPositions.append(ogre.Vector3(-100, 35, 0 + 100 * i))  # side view
@@ -138,8 +138,9 @@ class Level0(OgreOde.CollisionListener, object):
                 self.makeStartRoom(self.rootNode, ogre.Vector3(0, 0, -75.01 + 100 * i), scn)
             elif i == rooms + 1:
                 # final room
+                print 'i:', i
                 self.playerStarts.append(ogre.Vector3(0, 4, -125 + 100 * i))
-                self.makeEndRoom(self.rootNode, ogre.Vector3(0, 0, 25.01 + 100 * i), scn)
+                self.makeEndRoom(self.rootNode, ogre.Vector3(0, 0, -124.99 + 100 * i), scn)
 
         #Starting room Arrow hint
         self.startingArrow(-95)
@@ -167,7 +168,7 @@ class Level0(OgreOde.CollisionListener, object):
         
         # set the floor color properly
         sub = c.ent.getSubEntity(0)
-        sub.materialName = 'Floor%d' % ((i - 1 % 4))
+        sub.materialName = 'Floor%d' % ((i - 1) % 4)
         
         # copied from SimpleScenes_TriMesh, there's probably a much more efficient way to do this
         ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
@@ -275,6 +276,7 @@ class Level0(OgreOde.CollisionListener, object):
         containers[c.id] = c
         c.ent = scn.createEntity('EndRoom', 'ArenaEnd.mesh')
         c.node = self.rootNode.createChildSceneNode('EndRoom')
+        print 'End Room position: ', str(ogre.Vector3() + offset)
         c.node.setPosition(ogre.Vector3() + offset)
         c.node.attachObject(c.ent)
         c.ent.setCastShadows(False)
