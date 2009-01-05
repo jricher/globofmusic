@@ -177,6 +177,18 @@ class Level0(OgreOde.CollisionListener, object):
         
         c.geom.setUserData(c.id)
 
+
+        plane = Container('Infinite Wall %d' % (i - 1))
+        containers[plane.id] = plane
+        print 'infinite z:', offset.z + 50
+        plane.geom = OgreOde.InfinitePlaneGeometry(ogre.Plane(ogre.Vector3(0, 0, 1), offset.z + 50), self._world, self._space)
+        plane.geom.setUserData(plane.id)
+
+
+
+        return c
+
+
     def makeCrate(self, name, root, position, scn):
         c = Platform(name)
         containers[c.id] = c
