@@ -656,12 +656,26 @@ class GomApplication(sf.Application, object):
         self.createLights()
 
         ###
-        ### LOAD LEVEL 0
+        ### LOAD LEVELS
         ###
 
         import Level0
 
-        self.level = Level0.load(self)
+        import modulefinder
+        import levels
+        m = modulefinder.ModuleFinder()
+        l = m.find_all_submodules(levels)
+        ll = []
+        for x in l:
+            exec 'import ' + 'levels.' + x
+            exec 'print x, dir(levels.' + x + ')'
+            exec 'll.append(levels.' + x + ')'
+
+        for x in ll:
+            print x, type(x)
+            print x.Level()
+
+        self.level = Level0.load(self, l)
 
         self.level.setArea(0)
 
