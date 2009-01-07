@@ -41,13 +41,6 @@ class Level0(OgreOde.CollisionListener, object):
         self._plane = app._plane
         self.rootNode = app.sceneManager.getRootSceneNode()
         
-        self.dominoes = []
-        self.mazeBits = []
-        self.stairs = []
-        self.dominoResetPlatform = None
-        self.dominoOffset = 0
-        self.lastKey = None
-
         self.doorSounds = []
         
         self.ramps = []
@@ -91,7 +84,6 @@ class Level0(OgreOde.CollisionListener, object):
         del self.stairs[:]
         del self.dominoResetPlatform
         del self.dominoOffset
-        if self.lastKey: del self.lastKey
         del self.animations[:]
         if self.overlay:
             del self.overlay
@@ -157,13 +149,13 @@ class Level0(OgreOde.CollisionListener, object):
 
     def makeArena(self, root, offset, scn, i):
 
-        print 'Making arena: ' + str(i)
+        print 'Making arena: ' + str(i) + ' @ ' + str(offset)
         
         # set up the arena floors
         c = Arena('arena%d' % i, i)
         containers[c.id] = c
         c.ent = scn.createEntity('arena%d' % i, 'Arena.mesh')
-        c.node = self.rootNode.createChildSceneNode('arena%d' % (i - 1))
+        c.node = root.createChildSceneNode('arena%d' % (i - 1))
         c.node.setPosition(ogre.Vector3() + offset)
         c.node.attachObject(c.ent)
 
@@ -180,17 +172,34 @@ class Level0(OgreOde.CollisionListener, object):
         
         c.geom.setUserData(c.id)
 
-
-        #plane = Container('Infinite Wall %d' % (i - 1))
-        #containers[plane.id] = plane
-        #print 'infinite z:', offset.z + 50
-        #plane.geom = OgreOde.InfinitePlaneGeometry(ogre.Plane(ogre.Vector3(0, 0, 1), offset.z + 50), self._world, self._space)
-        #plane.geom.setUserData(plane.id)
-
-
+        self.makeBlockingWall(root, offset + ogre.Vector3(0, 210, 50), scn, i)
 
         return c
 
+    def makeBlockingWall(self, root, offset, scn, i):
+        c = Container('Big Wall %d' % i)
+        containers[c.id] = c
+        c.ent = scn.createEntity(c.name, "Cube.mesh")
+        #c.ent.setNormaliseNormals(True)
+        c.ent.setCastShadows(False)
+
+        #sub = c.ent.getSubEntity(0)
+        #sub.materialName = 'Ac3d/Door/Mat001_Tex00' # look like a door
+
+        c.node = root.createChildSceneNode(c.ent.getName())
+        c.node.attachObject(c.ent)
+
+        c.node.setPosition(offset)
+
+        c.node.setScale(400, 400, 0.00001)
+
+        ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+        c.geom = ei.createSingleStaticBox(self._world, self._space)
+        #c.geom = c.body.getGeometry(0)
+
+        c.geom.setUserData(c.id)
+        
+        return c
 
     def makeCrate(self, name, root, position, scn):
         c = Platform(name)
@@ -203,7 +212,7 @@ class Level0(OgreOde.CollisionListener, object):
         #sub = c.ent.getSubEntity(0)
         #sub.materialName = 'Ac3d/Door/Mat001_Tex00' # look like a door
 
-        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
+        c.node = root.createChildSceneNode(c.ent.getName())
         c.node.attachObject(c.ent)
 
         c.node.setPosition(position)
@@ -257,7 +266,7 @@ class Level0(OgreOde.CollisionListener, object):
         c = Arena('EndRoom', 5)
         containers[c.id] = c
         c.ent = scn.createEntity('EndRoom', 'ArenaEnd.mesh')
-        c.node = self.rootNode.createChildSceneNode('EndRoom')
+        c.node = root.createChildSceneNode('EndRoom')
         print 'End Room position: ', str(ogre.Vector3() + offset)
         c.node.setPosition(ogre.Vector3() + offset)
         c.node.attachObject(c.ent)
@@ -374,540 +383,6 @@ class Level0(OgreOde.CollisionListener, object):
 
         return doors
     
-    def loadArea3(self):
-        scn = self.rootNode.getCreator()
-        offset = 300
-
-        tilesize = 6
-        startx = tilesize * 5
-        starty = 0.2
-        startz = -(tilesize * 4)
-
-        # load our powerup
-
-        g = Powerup('gravity', 'GravityLift')
-        containers[g.id] = g
-        g.ent = scn.createEntity('GravityLift', 'GravityLift.mesh')
-        g.node = self.rootNode.createChildSceneNode()
-
-        g.node.attachObject(g.ent)
-        g.node.setPosition(startx + (tilesize * -7),
-                           3,
-                           startz + (tilesize * 7) + offset)
-
-        ei = OgreOde.EntityInformer(g.ent, ogre.Matrix4.getScale(self.player.node.getScale()))
-        g.geom = ei.createSingleStaticBox(self._world, self._space)
-
-        g.geom.setUserData(g.id)
-
-        g.sound = self.sounds['bell-hi-0']
-
-        g.overlay = ogre.OverlayManager.getSingleton().getByName('AntigravityOverlay')
-        g.overlay.hide()
-
-        # animation for the powerup
-        g.anim = scn.createAnimation('GravityLiftRotate', 8)
-        g.anim.interpolationMode = ogre.Animation.IM_SPLINE
-
-        track = g.anim.createNodeTrack(0, g.node)
-
-        key = track.createNodeKeyFrame(0)
-        key.setTranslate(g.node.getPosition())
-        key.setRotation(ogre.Quaternion(ogre.Degree(0), ogre.Vector3().UNIT_X))
-
-        key = track.createNodeKeyFrame(2)
-        key.setTranslate(g.node.getPosition())
-        key.setRotation(ogre.Quaternion(ogre.Degree(180), ogre.Vector3().UNIT_X))
-
-        key = track.createNodeKeyFrame(6)
-        key.setTranslate(g.node.getPosition())
-        key.setRotation(ogre.Quaternion(ogre.Degree(180), ogre.Vector3().UNIT_Z))
-
-        key = track.createNodeKeyFrame(8)
-        key.setTranslate(g.node.getPosition())
-        key.setRotation(ogre.Quaternion(ogre.Degree(0), ogre.Vector3().UNIT_X))
-
-        aState = scn.createAnimationState('GravityLiftRotate')
-        aState.setEnabled(True)
-        aState.setLoop(True)
-
-        self.animations.append(aState)
-
-
-        # create our exit key
-        key = MultiKey('Area3')
-        key.unlockCallback = self.areaClear
-        self.lastKey = key
-
-        ## functions for building the maze tiles
-
-        # available sounds for each type of maze unit
-        h0Sounds = ['tabla-%d' % i for i in range(0, 5)]
-        v1Sounds = ['bowen-%d' % i for i in range(0, 3)]
-        v2Sounds = ['wurl-%d' % i for i in range(0, 3)]
-        holesounds = ['neutron-0', 'neutron-1']
-        
-        def mkHPlane(x, y, z, isKey, lastKey):
-            '''
-            Create a single piece in the XZ Plane
-            '''
-            
-            name = 'mz_h_%d_%d_%d' % (x, y, z)
-
-            floor = y
-            
-            #print 'adding maze unit', name
-            
-            # scale the values appropriately
-            x = -x * tilesize + startx
-            y = y * tilesize + starty
-            z = z * tilesize + startz
-            
-
-            c = Platform(name, materialName = 'mazeGlass%d-' % floor)
-            containers[c.id] = c
-            c.ent = scn.createEntity(name, 'HPlane.mesh')
-            c.node = self.rootNode.createChildSceneNode()
-            c.node.setPosition(ogre.Vector3(x, y, z + offset))
-            c.node.attachObject(c.ent)
-            c.ent.setCastShadows(False)
-                    
-            ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-            c.geom = ei.createSingleStaticBox(self._world, self._space)
-            c.ent.setUserObject(c.geom)
-            c.geom.setUserData(c.id)
-                    
-            if isKey:
-                c.key = key
-                key.platforms.append(c)
-                c.materialName = 'mazeGlass-key-'
-                c.sound = self.sounds['key-%d' % lastKey]
-                c.quant = 8
-                lastKey += 1
-            else:
-                c.sound = self.sounds[random.choice(h0Sounds)]
-                
-            # set the initial material
-            c.setMaterial()
-
-            self.mazeBits.append(c.id)
-
-        def mkHole(x, y, z):
-            '''
-            Create a single piece in the XZ Plane with a hole in it
-            '''
-            
-            name = 'mz_hole_%d_%d_%d' % (x, y, z)
-
-            #print 'adding maze unit', name
-            
-            # scale the values appropriately
-            x = -x * tilesize + startx
-            y = y * tilesize + starty
-            z = z * tilesize + startz
-            
-
-            c = Platform(name, materialName = 'mazeGlass-hole-')
-            containers[c.id] = c
-            c.ent = scn.createEntity(name, 'Hole.mesh')
-            c.node = self.rootNode.createChildSceneNode()
-            c.node.setPosition(ogre.Vector3(x, y, z + offset))
-            c.node.attachObject(c.ent)
-            c.ent.setCastShadows(False)
-                    
-            ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-            c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-            c.ent.setUserObject(c.geom)
-            c.geom.setUserData(c.id)
-                    
-            c.sound = self.sounds[random.choice(holesounds)]
-
-            # set the initial material
-            c.setMaterial()
-            
-            self.mazeBits.append(c.id)
-
-
-        def mkVPlane(x, y, z, isKey, lastKey):
-            '''
-            Create a single piece in the XY Plane
-            '''
-            
-            name = 'mz_v1_%d_%d_%d' % (x, y, z)
-
-            floor = y
-
-            # scale the values appropriately
-            x = -x * tilesize + startx
-            y = y * tilesize + starty + tilesize / 2
-            z = z * tilesize + startz - tilesize / 2
-            
-            #print 'adding maze unit', name
-            
-            c = Platform(name, materialName = 'mazeGlass%d-' % floor)
-            containers[c.id] = c
-            c.ent = scn.createEntity(name, 'VPlane.mesh')
-            c.node = self.rootNode.createChildSceneNode()
-            c.node.setPosition(ogre.Vector3(x, y, z + offset))
-            c.node.attachObject(c.ent)
-            c.ent.setCastShadows(False)
-                    
-            ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-            c.geom = ei.createSingleStaticBox(self._world, self._space)
-            c.ent.setUserObject(c.geom)
-            c.geom.setUserData(c.id)
-                    
-            if isKey:
-                c.key = key
-                key.platforms.append(c)
-                c.materialName = 'mazeGlass-key-'
-                c.sound = self.sounds['key-%d' % lastKey]
-                c.quant = 8
-            else:
-                c.sound = self.sounds[random.choice(v1Sounds)]
-                
-            c.setMaterial()
-
-            self.mazeBits.append(c.id)
-
-
-        def mkVPlane2(x, y, z, isKey, lastKey):
-            '''
-            Create a single piece in the ZY Plane
-            '''
-            
-            name = 'mz_v2_%d_%d_%d' % (x, y, z)
-
-            floor = y
-            
-            x = -x * tilesize + startx - tilesize / 2
-            y = y * tilesize + starty + tilesize / 2
-            z = z * tilesize + startz
-            
-            #print 'adding maze unit', name
-            
-            c = Platform(name, materialName = 'mazeGlass%d-' % floor)
-            containers[c.id] = c
-            c.ent = scn.createEntity(name, 'VPlane2.mesh')
-            c.node = self.rootNode.createChildSceneNode()
-            c.node.setPosition(ogre.Vector3(x, y, z + offset))
-            c.node.attachObject(c.ent)
-            c.ent.setCastShadows(False)
-                    
-            ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-            c.geom = ei.createSingleStaticBox(self._world, self._space)
-            c.ent.setUserObject(c.geom)
-            c.geom.setUserData(c.id)
-                    
-                    
-            if isKey:
-                c.key = key
-                key.platforms.append(c)
-                c.materialName = 'mazeGlass-key-'
-                c.sound = self.sounds['key-%d' % lastKey]
-                c.quant = 8
-            else:
-                c.sound = self.sounds[random.choice(v2Sounds)]
-                
-            c.setMaterial()
-
-            self.mazeBits.append(c.id)
-
-
-        h0 = [
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 2, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 2, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 3, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 3, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 3, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 3, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 3, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 1, 1, 1, 3, 1, 1, 1, 0, 0],
-               [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 1, 1, 1, 1, 1, 3, 1, 0, 0],
-               [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-               [0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-               [0, 0, 1, 3, 3, 1, 1, 0, 0, 0],
-               [0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-               [0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-               [0, 0, 0, 1, 3, 1, 0, 0, 0, 0],
-               [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              ]
-        v1 = [
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-               [1, 1, 0, 1, 0, 0, 0, 0, 0, 1],
-               [1, 0, 1, 0, 0, 0, 1, 0, 0, 1],
-               [1, 1, 1, 0, 0, 0, 1, 0, 0, 1],
-               [1, 1, 1, 0, 1, 1, 1, 0, 0, 1],
-               [1, 1, 1, 0, 0, 0, 1, 0, 0, 1],
-               [1, 0, 0, 0, 1, 0, 1, 0, 1, 1],
-               [1, 0, 0, 1, 0, 1, 0, 0, 0, 1],
-               [1, 0, 0, 1, 0, 0, 1, 0, 0, 1]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [1, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-               [1, 0, 0, 0, 1, 0, 1, 1, 1, 1],
-               [1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
-               [1, 0, 1, 1, 0, 1, 0, 1, 0, 1],
-               [1, 0, 1, 0, 1, 1, 1, 0, 1, 1],
-               [1, 0, 1, 0, 1, 0, 1, 0, 0, 1],
-               [1, 0, 1, 0, 1, 0, 0, 0, 0, 1],
-               [1, 0, 1, 0, 1, 0, 1, 0, 0, 1],
-               [1, 0, 0, 0, 0, 0, 1, 0, 1, 1]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-               [0, 1, 0, 1, 0, 0, 0, 0, 1, 0],
-               [0, 1, 1, 0, 0, 1, 0, 0, 1, 0],
-               [0, 1, 1, 0, 1, 1, 0, 0, 1, 0],
-               [0, 1, 1, 1, 0, 0, 0, 0, 1, 0],
-               [0, 1, 1, 1, 1, 1, 1, 2, 1, 0],
-               [0, 1, 1, 0, 1, 0, 0, 0, 1, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-               [0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
-               [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 0, 1, 1, 1, 0, 0, 1, 0, 0],
-               [0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-               [0, 0, 0, 1, 1, 0, 1, 0, 0, 0],
-               [0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              ]
-        v2 = [
-              [[1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 0, 0, 1, 1, 0],
-               [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-               [1, 0, 1, 1, 0, 0, 1, 1, 0, 0],
-               [0, 1, 1, 0, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-               [1, 1, 1, 0, 0, 0, 1, 1, 1, 0]],
-              [[1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-               [1, 1, 0, 0, 0, 0, 0, 1, 0, 0],
-               [0, 0, 2, 1, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 1, 1, 1, 0, 0],
-               [1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 1, 1, 0, 1, 0],
-               [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
-               [0, 1, 1, 0, 0, 1, 1, 0, 1, 0],
-               [1, 1, 1, 1, 1, 1, 1, 1, 1, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
-               [0, 0, 1, 0, 0, 1, 1, 1, 0, 0],
-               [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 0, 1, 1, 0, 0],
-               [0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
-               [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-               [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
-               [0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-              ]
-        
-
-
-        lastKey = 0 # last key sound used
-        
-        for x in range(10):
-            for y in range(6):
-                for z in range(10):
-
-                    if h0[y][x][z]:
-                        if h0[y][x][z] == 3:
-                            mkHole(x, y, z)
-                        else:
-                            mkHPlane(x, y, z, h0[y][x][z] > 1, lastKey)
-                            if h0[y][x][z] > 1:
-                                lastKey += 1
-                    if v1[y][x][z]:
-                        mkVPlane(x, y, z, v1[y][x][z] > 1, lastKey)
-                        if v1[y][x][z] > 1:
-                            lastKey += 1
-                    if v2[y][x][z]:
-                        mkVPlane2(x, y, z, v2[y][x][z] > 1, lastKey)
-                        if v2[y][x][z] > 1:
-                            lastKey += 1
-                    
-
-        # one door to top off the maze
-
-        c = Door('MazeExitCap')
-        containers[c.id] = c
-        c.ent = scn.createEntity('MazeExitCap', 'MazeDoor.mesh')
-        c.ent.setCastShadows(False)
-        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
-        c.node.attachObject(c.ent)
-
-        #sub = c.ent.getSubEntity(0)
-        #sub.materialName = 'Ac3d/Door/Mat001_Tex00' # look like a door
-
-        # right in the middle
-        x = -5 * tilesize + startx
-        y = 6 * tilesize + starty + 0.5 # small offset so we don't hit a static collision thing
-        z = 4 * tilesize + startz + offset
-        c.node.setPosition(x, y, z)
-
-        ei = OgreOde.EntityInformer(c.ent, ogre.Matrix4.getScale(c.node.getScale()))
-        c.body = ei.createSingleDynamicBox(1.0,self._world, self._space)
-        
-        c.body.sleep() # put the door to sleep until we need it
-        c.geom = c.body.getGeometry(0)
-
-        c.sound = self.sounds[random.choice(self.doorSounds)]
-        c.geom.setUserData(c.id)
-            
-        l = OgreOde.FixedJoint(self._world)
-        l.attach(c.body)
-        c.locks.append(l)
-        c.locked = True
-        
-        key.doors.append(c)
-
-
-
-        # make some doors for the exit
-
-        def mkDoorCube(name, x, y, z):
-            c = Door(name)
-            containers[c.id] = c
-            c.ent = scn.createEntity(name, "Cube.mesh")
-            #c.ent.setNormaliseNormals(True)
-            c.ent.setCastShadows(True)
-
-            #sub = c.ent.getSubEntity(0)
-            #sub.materialName = 'Ac3d/Door/Mat001_Tex00' # look like a door
-
-
-            
-            c.node = self.rootNode.createChildSceneNode(c.ent.getName())
-            c.node.attachObject(c.ent)
-
-            c.node.setPosition(x + 0.5, y + 0.5, z + offset)
-
-            ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-            c.body = ei.createSingleDynamicBox(0.2,self._world, self._space)
-            #c.body.setDamping(2,2)
-            c.body.sleep() # put the doors to sleep until we need them
-            c.geom = c.body.getGeometry(0)
-
-            c.sound = self.sounds[random.choice(self.doorSounds)]
-            c.geom.setUserData(c.id)
-            
-            l = OgreOde.FixedJoint(self._world)
-            l.attach(c.body)
-            c.locks.append(l)
-            c.locked = True
-
-            key.doors.append(c)
-
-            return c
-        
-
-        for x in range(-8, 8):
-            for y in range(0, 5):
-                z = 49
-         
-                mkDoorCube('doorCube_%d_%d_%d' % (x, y, z), x, y, z)
-
-
-
 
     def initSounds(self, app):
         self.plsounds = {}
@@ -981,7 +456,6 @@ class Level0(OgreOde.CollisionListener, object):
         if self.area in [0, 1, 5] and area not in [0, 1, 5]:
             self.mm.stopSound(self.music['bg-1'], 0)
         elif self.area == 2:
-            self.clearDominoes()
             self.mm.stopSound(self.music['bg-2'], 0)
         elif self.area == 3:
             self.mm.stopSound(self.music['bg-3'], 0)
@@ -1318,277 +792,7 @@ class Level0(OgreOde.CollisionListener, object):
 
 
  
-    def nrackliffe_Dominoes(self, offset = 0):
-        scn = self.rootNode.getCreator()
-        # unlock key
-        key = MultiKey()
-        key.unlockCallback = self.areaClear
-        
-        self.dominoOffset = offset
-        
-        self.dominoStage1()
-    #Key Platforms
-        self.makePlatform("D_platform0", 5,offset+40,15,key, 0)
-        self.makePlatform("D_platform1", -5,offset+40,15,key, 1)
-        p = self.makePlatform("D_platform2", 14, offset, 10,key, 2)
-        p.fireCallback = self.dominoStage2
-        p = self.makePlatform("D_platform4", -14, offset, 10, key, 3)
-        p.fireCallback = self.dominoStage3
-        
-    #Reset Platform
-        ##Create a platform
-        c = Platform("ResetDominoes", materialName = 'njrWoodPallet-',restartable=True)
-        c.fireCallback = self.resetDominoes
-            
-        containers[c.id] = c
-        c.ent = scn.createEntity("ResetDominoes", 'WoodPallet.mesh')
-        c.node = self.rootNode.createChildSceneNode("ResetDominoes")
-        c.node.setPosition(ogre.Vector3(20, 6,offset-45))
-        quat = ogre.Quaternion(ogre.Degree(90),ogre.Vector3().UNIT_X)
-        c.node.setOrientation(quat)
-        c.node.attachObject(c.ent)
 
-        c.ent.setCastShadows(False)
-        
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['runup']
-        c.setMaterial()
-        
-        self.dominoResetPlatform = c    
-      
-        #make Domino doors to the next sublevel
-        floor = 2.1
-        jointAnchor = 0.1
-        door_offset = offset+50 #End of our area
-        
-        for i in [6,3,0,-3,-6]:
-            name = "DominoDoor_%d" %i
-            d = self.makeDominoDoor(name, i, door_offset, floor, jointAnchor)
-            key.doors.append(d)
-            
-    def dominoStage1(self):
-        offset = self.dominoOffset
-        floor = 2.5
-        for i in range(-27,0,3):
-            for j in range(0,10,1):
-                self.makeDomino("D_fan%d_%d" % (j,i), (j-5)*2.5, offset+i, floor+((i+27)/27.0)*j,0)
-
-        # I'm too lazy to figure out blender, so let's use dominoes
-        for i in range(0,10,1):
-            d = self.makeStair("D_Stairs_%d" % i,(i-5)*2.5, offset, floor+i*.9-2)
-            
-    def dominoStage2(self):
-        offset = self.dominoOffset
-        
-        
-        #High road
-        floor = 12
-        for i in range(5, 35, 2):
-            self.makeDomino("D_highroad_%d" % i, 14, offset+i, floor, 0)
-            self.makeDomino("D_highroad2_%d" % i,-14, offset+i, floor,0)
-        for i in range(-12,14,2):
-            self.makeDomino("D_highroadcenter_%d" %i, i, offset+37,floor,90)
-        self.makeDomino("D_highroad_leadin_00", -14, offset+35,floor,30)
-        self.makeDomino("D_highroad_leadin_01", -13, offset+36,floor,60)
-        self.makeDomino("D_highroad_leadin_03", 14, offset+35,floor,-30)
-        self.makeDomino("D_highroad_leadin_04", 13, offset+36,floor,-60)
-            
-    def dominoStage3(self):
-        offset = self.dominoOffset
-        floor = 2.5
-        self.clearDominoes()
-        
-        #NW corner
-        for i in range(0,14,1):
-            self.makeDomino("D_NWStair_%d" % i, i+28,offset+40-i, floor +10 - (i/(14.0))*10, -45)
-            self.makeDomino("D_SWStair_%d" % -i, -(i+28),offset+40-i, floor +10 - (i/(14.0))*10, 45)
-            
-        #Lead in
-        self.makeDomino("D_NWStair_013", 42,offset+25,floor,-30)
-        self.makeDomino("D_NWStair_014", 43,offset+24,floor,-20)
-        self.makeDomino("D_NWStair_015", 43.5,offset+23,floor,-10)
-        
-        #Leadout
-        self.makeDomino("D_NWStair_T01", 26, offset + 40, floor+10, -60)
-        self.makeDomino("D_NWStair_T02", 24, offset + 40, floor+11, -70)
-        self.makeDomino("D_NWStair_T03", 22, offset + 40, floor+12, -80)
-        
-        #Lead in
-        self.makeDomino("D_SWStair_013", -42,offset+25,floor,30)
-        self.makeDomino("D_SWStair_014", -43,offset+24,floor,20)
-        self.makeDomino("D_SWStair_015", -44,offset+22,floor,10)
-        
-        #Leadout
-        self.makeDomino("D_SWStair_T01", -26, offset + 40, floor+10, 60)
-        self.makeDomino("D_SWStair_T02", -24, offset + 40, floor+11, 70)
-        self.makeDomino("D_SWStair_T03", -22, offset + 40, floor+12, 80)
-
-
-        for i in range(-21,23,2):
-            #North Line
-            self.makeDomino("D_NorthLine_%d" % i, 44, offset+i, floor, 0)
-            #South Line
-            self.makeDomino("D_SouthLine_%d" % i, -44,offset+i, floor, 0)
-                
-        #Over the exit dominoes
-        floor = 16
-        for i in range(11,20,2):
-            self.makeDomino("D_Nexit_%d" % i, i, offset+40, floor, 90)
-            self.makeDomino("D_Sexit_%d" % i, -i, offset+40, floor, 90)
-            
-    # Subfunctions to create dominoes
-    def makeDomino(self, name, x, offset, floor, angle):
-        scn = self.rootNode.getCreator()
-        jointAnchor = floor-2.0  #Any lower and the domino won't fall all the way flat
-        c = Domino(name,angle, materialName = 'Domino-')
-        self.dominoes.append(c.id)
-        containers[c.id] = c
-        c.ent = scn.createEntity(name, "Domino.mesh")
-        #c.ent.setNormaliseNormals(True)
-        c.ent.setCastShadows(True)
-        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
-        c.node.attachObject(c.ent)
-        c.startPosition = (x,floor,offset)
-        c.node.setPosition(c.startPosition)
-        quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
-        c.node.setOrientation(quat)
-        ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-        c.body = ei.createSingleDynamicBox(5.0,self._world, self._space)
-        c.body.setDamping(2,2)
-        c.geom = c.body.getGeometry(0)
-        c.joint = OgreOde.HingeJoint(self._world)
-        c.joint.attach(c.body)
-        c.joint.setAxis(quat.xAxis())
-        c.joint.setAnchor(ogre.Vector3(x,jointAnchor,offset))
-    
-        #c.sound = random.choice(self.sounds.values())
-
-        c.sound = self.sounds['tabla-%d' % random.randint(0, 5)]
-        
-        #print c.sound.getFileName()
-        c.geom.setUserData(c.id)
-
-        c.setMaterial()
-        
-        return c
-
-    def makeDominoDoor(self, name,x,offset,floor,jointAnchor,angle=0.0):
-        scn = self.rootNode.getCreator()
-        c = Door(name)
-        containers[c.id] = c
-        c.ent = scn.createEntity(name, "door.mesh")
-        #c.ent.setNormaliseNormals(True)
-        c.ent.setCastShadows(True)
-        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
-        c.node.attachObject(c.ent)
-        c.startPosition = (x,floor,offset)
-        c.node.setPosition(c.startPosition)
-        quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
-        c.node.setOrientation(quat)
-        c.angle = angle
-        ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-        c.body = ei.createSingleDynamicBox(5.0,self._world, self._space)
-        c.body.setDamping(2,2)
-        c.geom = c.body.getGeometry(0)
-        c.joint = OgreOde.HingeJoint(self._world)
-        c.joint.attach(c.body)
-        c.joint.setAxis(quat.xAxis())
-        c.joint.setAnchor(ogre.Vector3(x,jointAnchor,offset+.1))
-    
-        c.sound = self.sounds[random.choice(self.doorSounds)]
-        
-        c.geom.setUserData(c.id)
-        
-        l = OgreOde.FixedJoint(self._world)
-        l.attach(c.body)
-        c.locks.append(l)
-        c.locked = True
-
-        return c
-    def makeStair(self, name,x,offset,floor):
-        scn = self.rootNode.getCreator()
-        c = Container(name)
-        containers[c.id] = c
-        # Let's put them with the dominoes so they go away afterwards
-        self.stairs.append(c.id)
-        c.ent = scn.createEntity(name, "door.mesh")
-        #c.ent.setNormaliseNormals(True)
-        c.ent.setCastShadows(False)
-        c.node = self.rootNode.createChildSceneNode(c.ent.getName())
-        c.node.setScale(0.1,0.1,0.1)
-        c.node.attachObject(c.ent)
-        c.startPosition = (x,floor,offset)
-        c.node.setPosition(c.startPosition)
-        ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-        c.geom = ei.createSingleStaticBox(self._world, self._space)
-        c.geom.setUserData(c.id)
-        return c
-
-    def makePlatform(self, name,x,offset,floor,key,snd):
-        scn = self.rootNode.getCreator()
-        ##Create a platform
-        c = Platform(name,materialName = 'platform0-')
-        containers[c.id] = c
-        c.ent = scn.createEntity(name, 'platform.mesh')
-        c.node = self.rootNode.createChildSceneNode(name)
-        c.node.setPosition(ogre.Vector3(x, floor,offset))
-        c.node.attachObject(c.ent)
-
-        c.ent.setCastShadows(True)
-        
-        ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-        c.geom = ei.createStaticTriangleMesh(self._world, self._space)
-        c.ent.setUserObject(c.geom)
-        c.geom.setUserData(c.id)
-
-        c.sound = self.sounds['key-%d' % (snd)]
-        c.quant = 8
-        c.setMaterial()
-
-        c.key = key
-        key.platforms.append(c)
-        
-        return c
-            
-        
-    def resetDominoes(self):
-        if self.dominoes:
-            
-            for id in self.dominoes:
-                domino = containers[id]
-                
-                domino.body.setAngularVelocity(ogre.Vector3().ZERO)
-                domino.body.setLinearVelocity(ogre.Vector3().ZERO)
-                domino.body.setPosition(domino.startPosition)
-                domino.body.setOrientation(ogre.Quaternion(ogre.Degree(domino.angle), ogre.Vector3().UNIT_Y))
-                domino.reset()
-            self.dominoResetPlatform.reset()
-            return True
-        else:
-            return False
-    def clearDominoes(self):
-        if self.dominoes:
-            for id in self.dominoes:
-                if containers[id].body:
-                    containers[id].body.wake()
-                del containers[id]
-            del self.dominoes [:]
-        if self.stairs:
-            for id in self.stairs:
-                del containers[id]
-            del self.stairs[:]
-    def clearWobblyPlatforms(self):
-        if self.WobblyPlatforms:
-            for id in self.WobblyPlatforms:
-                if containers[id].body:
-                    containers[id].body.wake()
-                del containers[id]
-            del self.WobblyPlatforms [:]
-                
     def areaClear(self):
         print 'Area clear!'
         if self.overlay:
@@ -1665,11 +869,3 @@ class Level0(OgreOde.CollisionListener, object):
         scn.destroySceneNode(c.node.getName())
         self.particles.clear()
 
-    def fireWholeMaze(self):
-        for mz in self.mazeBits:
-            c = containers[mz]
-            if c.arm():
-                if not self.mm.isFireKeyQueued(c.id):
-                    self.mm.addQueuedSound(c.sound, c.quant, c.rest, c.id)
-
-        del self.mazeBits[:]

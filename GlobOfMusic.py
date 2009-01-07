@@ -354,10 +354,6 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         if self.Keyboard.isKeyDown(OIS.KC_R) : self.buttons.add("Back")
         
         if self.Keyboard.isKeyDown(OIS.KC_N) : self.player.powerups.append("gravity")  #For cheaters
-        if self.Keyboard.isKeyDown(OIS.KC_M) : 
-            if self.level.lastKey:
-                for d in self.level.lastKey.doors:
-                    d.unlock()
         
         return True
         
