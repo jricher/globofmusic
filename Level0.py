@@ -115,16 +115,17 @@ class Level0(OgreOde.CollisionListener, object):
             if i > 0 and i < rooms + 1:
                 self.playerStarts.append(ogre.Vector3(0, 4, startz - 45 + 100 * i))
 
-                #self.makeCrate("crate " + str(i), self.rootNode, ogre.Vector3(0, 2, -100 + 100 * i), scn)
-                self.makeArena(self.rootNode, ogre.Vector3(0, 0, startz + 100 * i), scn, i)
+                #self.makeCrate("crate " + str(i), self.rootNode, ogre.Vector3(0, 2, startz + 100 * i), scn)
+                #self.makeArena(self.rootNode, ogre.Vector3(0, 0, startz + 100 * i), scn, i)
+                makeArena(app, ogre.Vector3(0, 0, startz + 100 * i), i)
             elif i == 0:
                 # first room
-                self.playerStarts.append(ogre.Vector3(0, 4, -75 + 100 * i))
+                self.playerStarts.append(ogre.Vector3(0, 4, startz + 25 + 100 * i))
                 self.makeStartRoom(self.rootNode, ogre.Vector3(0, 0, startz + 25 + 100 * i), scn, i)
             elif i == rooms + 1:
                 # final room
                 print 'i:', i
-                self.playerStarts.append(ogre.Vector3(0, 4, -125 + 100 * i))
+                self.playerStarts.append(ogre.Vector3(0, 4, startz - 125 + 100 * i))
                 self.makeEndRoom(self.rootNode, ogre.Vector3(0, 0, startz - 25 + 100 * i), scn, i)
 
         #Starting room Arrow hint
@@ -140,7 +141,7 @@ class Level0(OgreOde.CollisionListener, object):
         #self.loadArea3()
         #print 'Containers:', containers
 
-    def makeArena(self, root, offset, scn, i):
+    def DontmakeArena(self, root, offset, scn, i):
 
         print 'Making arena: ' + str(i) + ' @ ' + str(offset)
         
@@ -216,7 +217,7 @@ class Level0(OgreOde.CollisionListener, object):
         return c
 
     def makeCrate(self, name, root, position, scn):
-        c = Platform(name)
+        c = Fireable(name)
         containers[c.id] = c
         c.ent = scn.createEntity(name, "Cube.mesh")
         #c.ent.setNormaliseNormals(True)
@@ -636,16 +637,16 @@ class Level0(OgreOde.CollisionListener, object):
                     
                 
                 # see if something hit a platform that wasn't the player
-                elif isinstance(containers[u1], Platform):
+                elif isinstance(containers[u1], Fireable):
                     return self.collideWithPlatform(containers[u1], containers[u2], contact, contact.getNormal())
-                elif isinstance(containers[u2], Platform):
+                elif isinstance(containers[u2], Fireable):
                     return self.collideWithPlatform(containers[u2], containers[u1], contact, -contact.getNormal())
                 
                 #Deal with door collisions
                 elif isinstance(containers[u1], Door):
                     return self.collideWithDoor(containers[u1], containers[u2], contact, contact.getNormal())
                 elif isinstance(containers[u2], Door):
-                    return self.collideWithDoor(containers[u2], containers[u1], contact, contact.getNormal())
+                    return self.collideWithDoor(containers[u2], containers[u1], contact, -contact.getNormal())
 
                 else:
                     print 'Strange container collision: %s <=> %s' % (containers[u1].name, containers[u2].name)
@@ -900,4 +901,59 @@ class Level0(OgreOde.CollisionListener, object):
         del c.particleSystem
         scn.destroySceneNode(c.node.getName())
         self.particles.clear()
+
+
+
+def makeArena(app, offset, i):
+
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+
+    print 'Making arena: ' + str(i) + ' @ ' + str(offset)
+    
+    # set up the arena floors
+    floor = ArenaFloor('ArenaFloor%d' % i, i)
+    containers[floor.id] = floor
+    floor.ent = scn.createEntity('ArenaFloor%d' % i, 'ArenaFloor.mesh')
+    floor.node = root.createChildSceneNode('ArenaFloor%d' % i)
+    floor.node.setPosition(ogre.Vector3() + offset)
+    floor.node.attachObject(floor.ent)
+
+    floor.ent.setCastShadows(False)
+    
+    # set the floor color properly
+    sub = floor.ent.getSubEntity(0)
+    sub.materialName = 'Floor%d' % ((i) % 4)
+    
+    # copied from SimpleScenes_TriMesh, there's probably a much more efficient way to do this
+    ei = OgreOde.EntityInformer(floor.ent, floor.node._getFullTransform())
+    floor.geom = ei.createStaticTriangleMesh(app._world, app._space)
+    floor.ent.setUserObject(floor.geom)
+    
+    floor.geom.setUserData(floor.id)
+
+    # make some walls
+    wall = ArenaWalls('ArenaWall%d' % i, i)
+    containers[wall.id] = wall
+    wall.ent = scn.createEntity('ArenaWall%d' % i, 'ArenaWalls.mesh')
+    wall.node = root.createChildSceneNode('ArenaWall%d' % i)
+    wall.node.setPosition(ogre.Vector3() + offset)
+    wall.node.attachObject(wall.ent)
+
+    wall.ent.setCastShadows(False)
+    
+    # set the wall color properly
+    sub = wall.ent.getSubEntity(0)
+    #sub.materialName = 'wall%d' % ((i) % 4)
+    
+    # copied from SimpleScenes_TriMesh, there's probably a much more efficient way to do this
+    ei = OgreOde.EntityInformer(wall.ent, wall.node._getFullTransform())
+    wall.geom = ei.createStaticTriangleMesh(app._world, app._space)
+    wall.ent.setUserObject(wall.geom)
+    
+    wall.geom.setUserData(wall.id)
+
+    #self.makeBlockingWall(root, offset + ogre.Vector3(0, 210, 50), scn, i)
+
+    return Arena(floor, wall, i)
 
