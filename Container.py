@@ -152,7 +152,7 @@ class Powerup(Container):
             
             
 
-class Platform(Container):
+class Fireable(Container):
     def __init__(self, name = None, materialName = None, restartable = False, key = None):
         Container.__init__(self, name)
         self.state = 'waiting'
@@ -226,6 +226,15 @@ class Platform(Container):
         if self.ent and self.materialName:
             sub = self.ent.getSubEntity(0)
             sub.materialName = self.materialName + self.state
+
+class Platform(Fireable):
+    def __init__(self, name = None, materialName = None, restartable = False, key = None):
+        Fireable.__init__(self, name)
+    def __del__(self):
+        if not Fireable:
+            return
+        Fireable.__del__(self)
+
                 
 class MultiKey(object):
     def __init__(self, name = None):
@@ -257,7 +266,7 @@ class MultiKey(object):
             if self.unlockCallback:
                 self.unlockCallback()
  
-class Arena(Container):
+class ArenaFloor(Container):
     def __init__(self, name, arenaId):
         Container.__init__(self, name)
         self.hit = False
@@ -270,6 +279,27 @@ class Arena(Container):
         del self.hit
         del self.arenaId
 
+class ArenaWalls(Container):
+    def __init__(self, name, arenaId):
+        Container.__init__(self, name)
+        self.arenaId = arenaId
+
+    def __del__(self):
+        if not Container:
+            return
+        Container.__del__(self)
+        del self.arenaId
+
+class Arena(object):
+    def __init__(self, floor, walls, arenaId):
+        self.floor = floor
+        self.walls = walls
+        self.arenaId = arenaId
+
+    def __del__(self):
+        del self.floor
+        del self.walls
+        del self.arenaId
     
 class Door(Container):
     def __init__(self, name):

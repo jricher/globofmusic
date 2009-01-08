@@ -478,8 +478,9 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
             if "A" in self.buttons and self.player.jumpVector and self.player.jumpTime > 0.0:
                 #jv = self.player.jumpVector * 2 + ogre.Vector3.UNIT_Y * 10 * self.player.jumpVector.y
                 #jv = ogre.Vector3(self.player.jumpVector.x, self.player.jumpVector.y * 100, self.player.jumpVector.z)
+                #jv = ogre.Vector3(0, self.player.jumpVector.y, 0) #ogre.Vector3(self.player.jumpVector.x, (self.player.jumpVector.y + 1) * 100, self.player.jumpVector.z)
                 jv = ogre.Vector3(self.player.jumpVector.x, (self.player.jumpVector.y + 1) * 100, self.player.jumpVector.z)
-
+                
                 jv.normalise()
             
                 # Jump
@@ -630,7 +631,7 @@ class GomApplication(sf.Application, object):
         self.player.node = rootNode.createChildSceneNode('Player')
         self.player.node.attachObject(self.player.ent)
 
-        self.player.node.setPosition(ogre.Vector3(0, 5, 0))
+        #self.player.node.setPosition(ogre.Vector3(0, 5, 0))
 
         # the OgreOde EntityInformer lets us connect ODE physics to OGRE geometry (i think)
         #
@@ -667,11 +668,7 @@ class GomApplication(sf.Application, object):
             exec 'print x, dir(levels.' + x + ')'
             exec 'll.append(levels.' + x + ')'
 
-        for x in ll:
-            print x, type(x)
-            print x.Level()
-
-        self.level = Level0.load(self, l)
+        self.level = Level0.load(self, ll)
 
         self.level.setArea(0)
 
