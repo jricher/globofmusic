@@ -87,7 +87,8 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         self.fov = 5
 
         self.buttons = set()
-        
+
+        # TODO: these need to by dynamic based on the actual camera
         self.altitude = 50
         self.azimuth = 200
 
