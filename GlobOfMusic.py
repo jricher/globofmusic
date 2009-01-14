@@ -151,8 +151,8 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         
             #print p_0
             #print p_1
-            #print "self.azimuth [%d]" % self.azimuth
-            #print "self.altitude [%d]" % self.altitude
+            print "self.azimuth [%d]" % self.azimuth
+            print "self.altitude [%d]" % self.altitude
             
             #self.camera.moveRelative(ogre.Vector3(self.xcAxis, -self.ycAxis,0.0))
             node = self.camera.getParentSceneNode()
@@ -588,8 +588,6 @@ class GomApplication(sf.Application, object):
         self.camera = self.sceneManager.createCamera('PlayerCam')
 
         node = self.sceneManager.getRootSceneNode().createChildSceneNode('PlayerCamNode')
-        #This puts the camera at azimuth 200, altitude 50
-        node.setPosition(-215.954, 192.836, -178.601)
         node.attachObject(self.camera)
         
         # zoom a little bit
@@ -810,6 +808,8 @@ class GomApplication(sf.Application, object):
         # "create FrameListener"
         self.frameListener = GomFrameListener(self, self.renderWindow, self.camera)
         self.frameListener.showDebugOverlay(False)
+        # kick the frameListener to update the camera position
+        self.frameListener.zcAxis = 1.0;
 
         self.root.addFrameListener(self.frameListener)
 

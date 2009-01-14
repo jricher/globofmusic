@@ -103,14 +103,7 @@ class Level0(OgreOde.CollisionListener, object):
         rooms = len(roomList)
         startz = -100 * (rooms / 2)
         for i in range(0, rooms + 2):
-            #self.cameraPositions.append(ogre.Vector3(10, 35, -60 + 100 * i)) # front view
-            #self.cameraPositions.append(ogre.Vector3(-100, 35, 0 + 100 * i))  # side view
-            #self.cameraPositions.append(ogre.Vector3(-55, 45, -100 + 100 * i))  # side view
             self.cameraPositions.append(ogre.Vector3(0, 0, startz + 100 * i))  # Anchor point
-
-
-            # JR: CHANGE THIS
-            #self.cameraPositions.append(ogre.Vector3(10, 10, 70 + 100 * i)) # front view
 
             if i > 0 and i < rooms + 1:
                 self.playerStarts.append(ogre.Vector3(0, 4, startz - 45 + 100 * i))
@@ -130,8 +123,6 @@ class Level0(OgreOde.CollisionListener, object):
 
         (leftDoor, rightDoor) = makeSwingingDoors(app, ogre.Vector3(0, 0, 25))
 
-
-        #print 'Containers:', containers
 
     def initSounds(self, app):
         self.plsounds = {}
@@ -257,6 +248,7 @@ class Level0(OgreOde.CollisionListener, object):
         key.setTranslate(node.getPosition())
         
         key = animationTrack.createNodeKeyFrame(2)
+        #NJRTODO
         #key.setTranslate (self.cameraPositions[self.area] - self.camera.getPosition())
         key.setTranslate(node.getPosition() + ogre.Vector3().UNIT_Z*100)
         animationState = sceneManager.createAnimationState('CameraTrack')
