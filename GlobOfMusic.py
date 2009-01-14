@@ -27,6 +27,11 @@ from Container import *
 from threading import Thread
 import time
 
+import Level0
+
+import modulefinder
+import levels
+
 # don't think we need this one, seriously
 # import PythonOgreConfig
 
@@ -657,10 +662,6 @@ class GomApplication(sf.Application, object):
         ### LOAD LEVELS
         ###
 
-        import Level0
-
-        import modulefinder
-        import levels
         m = modulefinder.ModuleFinder()
         l = m.find_all_submodules(levels)
         ll = []
@@ -813,8 +814,8 @@ class GomApplication(sf.Application, object):
         self.root.addFrameListener(self.frameListener)
 
     def _isPsycoEnabled(self):
-        # return False
-        return True
+        return False
+        #return True
 
     def _configure(self):
         """This shows the config dialog and creates the renderWindow."""
