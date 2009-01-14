@@ -91,6 +91,10 @@ class Container(object):
             self.body = None
             self.geom = None
 
+    def collide(self, other, contact, normal):
+        # by default, everything's collidable
+        return True
+
 def _mkId():
     '''
     Generator function for unique IDs
@@ -124,6 +128,18 @@ class Player(Container):
         if self.powerups:
             del self.powerups
         Container.__del__(self)
+
+    def collide(self, other, contact, normal):
+        # take care of jumping, that's it
+        if normal != self.jumpVector:
+            self.jumpVector = normal
+
+        self.jumpTime = 0.050 # jump for just a bit
+
+        # the player object isn't collidable on its own
+        return False
+                    
+
 
 class Powerup(Container):
     def __init__(self, powerupName, name = None):
@@ -227,6 +243,8 @@ class Fireable(Container):
             sub = self.ent.getSubEntity(0)
             sub.materialName = self.materialName + self.state
 
+    
+
 class Platform(Fireable):
     def __init__(self, name = None, materialName = None, restartable = False, key = None):
         Fireable.__init__(self, name)
@@ -279,6 +297,15 @@ class ArenaFloor(Container):
         del self.hit
         del self.arenaId
 
+    def collide(self, other, contact, normal):
+        # floors are pretty sticky
+        contact.setCoulombFriction( 9999999999 )    ### OgreOde.Utility.Infinity)
+        contact.setBouncyness(0.4)
+    
+        ## Yes, this collision is valid
+        return True
+        
+
 class ArenaWalls(Container):
     def __init__(self, name, arenaId):
         Container.__init__(self, name)
@@ -290,6 +317,11 @@ class ArenaWalls(Container):
         Container.__del__(self)
         del self.arenaId
 
+    def collide(self, other, contact, normal):
+        contact.setCoulombFriction( 10 )    # walls are pretty slick
+        contact.setBouncyness(0.4)
+        return True
+    
 class Arena(object):
     def __init__(self, floor, walls, arenaId):
         self.floor = floor

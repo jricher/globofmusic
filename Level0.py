@@ -305,37 +305,21 @@ class Level0(OgreOde.CollisionListener, object):
             #print u1, u2
 
             if u1 in containers and u2 in containers:
-                #print containers[u1], containers[u1].name, 'collided with', containers[u2], containers[u2].name
-                if containers[u1] is self.player:
-                    return self.collideWithPlayer(containers[u2], contact, contact.getNormal())
-                elif containers[u2] is self.player:
-                    return self.collideWithPlayer(containers[u1], contact, -contact.getNormal())
-                #by this point, we know it's not a player
 
-                #Deal with domino collisions
-                elif isinstance(containers[u1], Domino):
-                    return self.collideWithDomino(containers[u1], containers[u2], contact, contact.getNormal())
-                elif isinstance(containers[u2], Domino):
-                    return self.collideWithDomino(containers[u2], containers[u1], contact, -contact.getNormal())
-                    
+                c1 = containers[u1]
+                c2 = containers[u2]
                 
-                # see if something hit a platform that wasn't the player
-                elif isinstance(containers[u1], Fireable):
-                    return self.collideWithPlatform(containers[u1], containers[u2], contact, contact.getNormal())
-                elif isinstance(containers[u2], Fireable):
-                    return self.collideWithPlatform(containers[u2], containers[u1], contact, -contact.getNormal())
-                
-                #Deal with door collisions
-                elif isinstance(containers[u1], Door):
-                    return self.collideWithDoor(containers[u1], containers[u2], contact, contact.getNormal())
-                elif isinstance(containers[u2], Door):
-                    return self.collideWithDoor(containers[u2], containers[u1], contact, -contact.getNormal())
+                # we've got two Container objects, now we can collide them with each other (maybe)
 
+                col1 = c1.collide(c2, contact, contact.getNormal())
+                col2 = c2.collide(c1, contact, -contact.getNormal())
+
+                if col1 or col2:
+                    # if either of the collisions is true, we're OK
+                    return True
                 else:
-                    print 'Strange container collision: %s <=> %s' % (containers[u1].name, containers[u2].name)
-                    
-
-        return True
+                    return False
+                
 
     def collideWithDoor(self, me, other, contact, normal):
 
@@ -352,11 +336,6 @@ class Level0(OgreOde.CollisionListener, object):
     def collideWithPlayer(self, other, contact, normal):
 
         # note that normal may be flipped on the way in
-        if normal != self.player.jumpVector:
-            self.player.jumpVector = normal
-
-        self.player.jumpTime = 0.050 # jump for just a bit
-                    
         if isinstance(other, ArenaFloor):
             #print 'got a player and an arena'
             if not other.hit:
