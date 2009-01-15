@@ -6,8 +6,8 @@ import ogre.io.OIS as OIS
 from Container import *
 
 class Level(BaseLevel):
-##    def __init__(self, levelId):
-##        BaseLevel.__init__(self, levelId)
+    def __init__(self, levelId):
+        BaseLevel.__init__(self, levelId)
 ##
 ##
 ##    def __del__(self):
