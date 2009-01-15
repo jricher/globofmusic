@@ -97,7 +97,7 @@ class LevelManager(OgreOde.CollisionListener, object):
 
             if i > 0 and i < n + 1:
                 level = levels[i - 1].Level(i)
-                level.cameraPosition = ogre.Vector3(0, 0, startz + 100 * i)
+                level.cameraAnchor = ogre.Vector3(0, 0, startz + 100 * i)
                 level.playerStart = ogre.Vector3(0, 4, startz - 45 + 100 * i)
 
                 #self.makeCrate("crate " + str(i), self.rootNode, ogre.Vector3(0, 2, startz + 100 * i), scn)
@@ -113,14 +113,14 @@ class LevelManager(OgreOde.CollisionListener, object):
             elif i == 0:
                 # first room
                 level = BaseLevel(i)
-                level.cameraPosition = ogre.Vector3(0, 0, startz + 100 * i)
+                level.cameraAnchor = ogre.Vector3(0, 0, startz + 100 * i)
                 level.playerStart = ogre.Vector3(0, 4, startz + 25 + 100 * i)
                 level.arena = makeStartRoom(app, ogre.Vector3(0, 0, startz + 25 + 100 * i), i)
                 self.levels.append(level)
             elif i == n + 1:
                 # final room
                 level = BaseLevel(i)
-                level.cameraPosition = ogre.Vector3(0, 0, startz + 100 * i)
+                level.cameraAnchor = ogre.Vector3(0, 0, startz + 100 * i)
                 level.playerStart = ogre.Vector3(0, 4, startz - 125 + 100 * i)
                 level.arena = makeEndRoom(app, ogre.Vector3(0, 0, startz - 25 + 100 * i), i)
                 self.levels.append(level)
@@ -181,11 +181,7 @@ class LevelManager(OgreOde.CollisionListener, object):
         if level >= len(self.levels):
             print 'Error: level id too big', level
             return
-        
-        if level <= self.currentLevel:
-            print 'Error: level going backwards'
-            return
-        
+             
         # warp the character if we're just starting
         if self.currentLevel == -1:
             self.player.warpTo = (self.levels[level].playerStart)
@@ -197,7 +193,7 @@ class LevelManager(OgreOde.CollisionListener, object):
             self.mm.stopSound(self.levels[self.currentLevel].backgroundMusic, 0)
         else:
             self.mm.stopSound(self.defaultBackgroundMusic, 0)
-
+        oldlevel = self.currentLevel
         self.currentLevel = level
 
         if self.levels[self.currentLevel].backgroundMusic:
@@ -205,12 +201,8 @@ class LevelManager(OgreOde.CollisionListener, object):
         else:
             self.mm.addQueuedSound(self.defaultBackgroundMusic, self.mm.totalBeats)
         
-
-        
         # move the camera
         if self.currentLevel != 0: # Don't animate the camera to start
-            
-            #self.camera.setPosition(self.cameraPositions[self.area])
             
             node = self.camera.getParentSceneNode()
 
@@ -238,8 +230,8 @@ class LevelManager(OgreOde.CollisionListener, object):
             key.setTranslate(node.getPosition())
             
             key = animationTrack.createNodeKeyFrame(2)
-            #key.setTranslate (self.levels[self.currentLevel].cameraPosition - self.camera.getPosition())
-            key.setTranslate(node.getPosition() + ogre.Vector3().UNIT_Z*100)
+            #Move from the current anchor to the next one
+            key.setTranslate(node.getPosition() + (self.levels[self.currentLevel].cameraAnchor-self.levels[oldlevel].cameraAnchor))
             animationState = sceneManager.createAnimationState('CameraTrack')
             animationState.setEnabled(True)
             animationState.setLoop(False)

@@ -325,8 +325,7 @@ class ArenaFloor(Container):
             contact.setCoulombFriction( 9999999999 )    ### OgreOde.Utility.Infinity)
             contact.setBouncyness(0.4)
 
-            if not self.hit:
-                self.hit = True
+            if lm.currentLevel is not self.arenaId :
                 lm.setCurrentLevel(self.arenaId)
     
         ## Yes, this collision is valid
@@ -436,7 +435,7 @@ containers = {}
 class BaseLevel(object):
     def __init__(self, levelId):
         self.levelId = levelId
-        self.cameraPosition = None
+        self.cameraAnchor = None
         self.playerStart = None
         self.backgroundMusic = None
         self.arena = None
@@ -444,7 +443,7 @@ class BaseLevel(object):
         
     def __del__(self):
         del self.levelId
-        del self.cameraPosition
+        del self.cameraAnchor
         del self.playerStart
         del self.backgroundMusic
         del self.arena

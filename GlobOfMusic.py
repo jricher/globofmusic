@@ -141,8 +141,7 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
             if self.fov > 60: self.fov = 60
             self.camera.setFOVy(ogre.Radian(ogre.Degree(self.fov)))
         
-            p_0 = self.level.levels[self.level.currentLevel].cameraPosition
-            #p_0 = ogre.Vector3.ZERO
+            p_0 = self.level.levels[self.level.currentLevel].cameraAnchor
             
             radius = 300.0
             p_1 = ogre.Vector3(p_0.x + radius* math.cos(math.radians(self.azimuth)) * math.sin(math.radians(self.altitude)),
