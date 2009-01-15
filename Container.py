@@ -769,7 +769,7 @@ def makeTiltingPlatform(app, name, offset, material='platform0-'):
     
     c = Platform(name = name, materialName = material)
     containers[c.id] = c
-    c.ent = scn.createEntity(name, 'platform.mesh')
+    c.ent = scn.createEntity(name, 'Cup.mesh')
     c.node = root.createChildSceneNode(name)
     c.node.attachObject(c.ent)
 
@@ -799,44 +799,6 @@ def makeTiltingPlatform(app, name, offset, material='platform0-'):
     c.geom.setUserData(c.id)
 
     return c
-
-def makePlatform(app, name, offset, mass=20.0, fixed=True, material='platform0-'):
-    scn = app.sceneManager
-    root = scn.getRootSceneNode()
-    
-    c = Platform(name = name, materialName = material)
-    containers[c.id] = c
-    c.ent = scn.createEntity(name, 'platform.mesh')
-    c.node = root.createChildSceneNode(name)
-    c.node.attachObject(c.ent)
-
-    c.ent.setCastShadows(True)
-
-    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
-
-    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
-    c.node.attachObject(c.body)
-    mass = OgreOde.BoxMass (mass, ei.getSize())
-    mass.setDensity(5.0, ei.getSize())
-    c.body.setMass(mass)
-    
-    c.geom.setBody(c.body)
-    c.ent.setUserObject(c.geom)
-    
-    c.body.setPosition(offset)
-    
-    if (fixed):
-        c.joint = OgreOde.FixedJoint(app._world)
-        c.joint.attach(c.body)
-        c.joint.setAnchor(offset)
-
-    # set the initial material
-    c.setMaterial()
-
-    c.geom.setUserData(c.id)
-
-    return c    
 
 def makeSwingingDoors(app, offset):
     scn = app.sceneManager
