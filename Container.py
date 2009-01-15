@@ -28,6 +28,8 @@ class Container(object):
         self.rest = None # MusicManager post-sound rest
         self.name = name  # name to refer to this by
         self.anim = None # animation
+        self.friction = 50
+        self.bouncy = 0.1
         
         self.id = _mkId() # unique ID (useful for setUserData calls)
 
@@ -62,6 +64,10 @@ class Container(object):
             del self.id
         if self.anim:
             del self.anim
+        if self.friction:
+            del self.friction
+        if self.bouncy:
+            del self.bouncy
         #print "Container deleted"
         
     def destroy(self):
@@ -91,8 +97,16 @@ class Container(object):
             self.body = None
             self.geom = None
 
-    def collide(self, other, contact, normal):
+    def collide(self, other, contact, normal, lm):
         # by default, everything's collidable
+
+        contact.setCoulombFriction(max(self.friction, other.friction))
+        contact.setBouncyness(max(self.bouncy, other.bouncy))
+
+        # make a noise if the player hits it
+        if isinstance(other, Player) and self.sound:
+            lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
+
         return True
 
 def _mkId():
@@ -129,7 +143,7 @@ class Player(Container):
             del self.powerups
         Container.__del__(self)
 
-    def collide(self, other, contact, normal):
+    def collide(self, other, contact, normal, lm):
         # take care of jumping, that's it
         if normal != self.jumpVector:
             self.jumpVector = normal
@@ -243,11 +257,19 @@ class Fireable(Container):
             sub = self.ent.getSubEntity(0)
             sub.materialName = self.materialName + self.state
 
+
+    def collide(self, other, contact, normal, lm):
+        if self.arm():
+            if not lm.mm.isFireKeyQueued(self.id):
+                lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
+        return True
+        
+
     
 
 class Platform(Fireable):
     def __init__(self, name = None, materialName = None, restartable = False, key = None):
-        Fireable.__init__(self, name)
+        Fireable.__init__(self, name, materialName, restartable, key)
     def __del__(self):
         if not Fireable:
             return
@@ -297,10 +319,15 @@ class ArenaFloor(Container):
         del self.hit
         del self.arenaId
 
-    def collide(self, other, contact, normal):
-        # floors are pretty sticky
-        contact.setCoulombFriction( 9999999999 )    ### OgreOde.Utility.Infinity)
-        contact.setBouncyness(0.4)
+    def collide(self, other, contact, normal, lm):
+        if isinstance(other, Player):
+            # floors are pretty sticky
+            contact.setCoulombFriction( 9999999999 )    ### OgreOde.Utility.Infinity)
+            contact.setBouncyness(0.4)
+
+            if not self.hit:
+                self.hit = True
+                lm.setCurrentLevel(self.arenaId)
     
         ## Yes, this collision is valid
         return True
@@ -317,11 +344,11 @@ class ArenaWalls(Container):
         Container.__del__(self)
         del self.arenaId
 
-    def collide(self, other, contact, normal):
+    def collide(self, other, contact, normal, lm):
         contact.setCoulombFriction( 10 )    # walls are pretty slick
-        contact.setBouncyness(0.4)
+        contact.setBouncyness(0.9)
         return True
-    
+
 class Arena(object):
     def __init__(self, floor, walls, arenaId):
         self.floor = floor
@@ -332,6 +359,20 @@ class Arena(object):
         del self.floor
         del self.walls
         del self.arenaId
+    
+class GroundPlane(Container):
+    def __init__(self, name):
+        Container.__init__(self, name)
+
+    def __del__(self):
+        if not Container:
+            return
+        Container.__del__(self)
+
+    def collide(self, other, contact, normal, lm):
+        if isinstance(other, Player):
+            lm.resetPlayer()
+        return True
     
 class Door(Container):
     def __init__(self, name):
@@ -392,6 +433,22 @@ containers = {}
 
 
 
+class BaseLevel(object):
+    def __init__(self, levelId):
+        self.levelId = levelId
+        self.cameraPosition = None
+        self.playerStart = None
+        self.backgroundMusic = None
+        self.arena = None
+        self.offset = None
+        
+    def __del__(self):
+        del self.levelId
+        del self.cameraPosition
+        del self.playerStart
+        del self.backgroundMusic
+        del self.arena
+        del self.offset
 
 # creation functions
 def makeArena(app, offset, i):
@@ -549,6 +606,10 @@ def makeStartRoom(app, offset, i):
     #Starting Room platform
     key = MultiKey()
     c = makeTiltingPlatform(app, 'StatringRoom Platform0', offset + ogre.Vector3(0, 2, -10))
+
+    c.sound = app.sounds['key-0']
+    c.quant = 8
+    
     c.key = key
     key.platforms.append(c)
 
@@ -607,7 +668,7 @@ def makeTiltingPlatform(app, name, offset, material='platform0-'):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     
-    c = Platform(name = name, materialName = 'platform0-')
+    c = Platform(name = name, materialName = material)
     containers[c.id] = c
     c.ent = scn.createEntity(name, 'platform.mesh')
     c.node = root.createChildSceneNode(name)

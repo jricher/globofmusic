@@ -21,7 +21,7 @@ import time
 import random
 
 class LevelManager(OgreOde.CollisionListener, object):
-    def __init__(self, app, roomList):
+    def __init__(self, app, levels):
         OgreOde.CollisionListener.__init__(self)
 
         self.tempo = 90
@@ -35,14 +35,13 @@ class LevelManager(OgreOde.CollisionListener, object):
         
         self.doorSounds = []
         
-        self.cameraPositions = []
-        self.playerStarts = []
-
         self.overlay = None
         self.overlayTimeout = None
         
         # this is uninitialized
-        self.area = -1
+        self.currentLevel = -1
+        self.levels = []
+
 
         # list of animations to play
         self.animations = []
@@ -53,9 +52,9 @@ class LevelManager(OgreOde.CollisionListener, object):
 
         self.initSounds(app)
 
-        self.initGraphics(app, roomList)
+        self.initGraphics(app, levels)
 
-        self.setArea(0)
+        self.setCurrentLevel(0)
 
         
     def __del__(self):
@@ -65,9 +64,8 @@ class LevelManager(OgreOde.CollisionListener, object):
         del self._world
         del self._space
         del self.mm
-        del self.music
-        del self.sounds
-        del self.area
+        del self.currentLevel
+        del self.levels[:]
         del self.player
         del self._plane
         if self.particles: self.particleSystemCleanup()
@@ -75,11 +73,10 @@ class LevelManager(OgreOde.CollisionListener, object):
         del self.animations[:]
         if self.overlay:
             del self.overlay
-        del self.doorSounds[:]
         del self.rootNode
 
         
-    def initGraphics(self, app, roomList):
+    def initGraphics(self, app, levels):
 
         scn = app.sceneManager
 
@@ -94,48 +91,59 @@ class LevelManager(OgreOde.CollisionListener, object):
 
         
         # store up calculated positions while we're at it
-        rooms = len(roomList)
-        startz = -100 * (rooms / 2)
-        for i in range(0, rooms + 2):
-            self.cameraPositions.append(ogre.Vector3(0, 0, startz + 100 * i))  # Anchor point
+        n = len(levels)
+        startz = -100 * (n / 2)
+        for i in range(0, n + 2):
 
-            if i > 0 and i < rooms + 1:
-                self.playerStarts.append(ogre.Vector3(0, 4, startz - 45 + 100 * i))
+            if i > 0 and i < n + 1:
+                level = levels[i - 1].Level(i)
+                level.cameraPosition = ogre.Vector3(0, 0, startz + 100 * i)
+                level.playerStart = ogre.Vector3(0, 4, startz - 45 + 100 * i)
 
                 #self.makeCrate("crate " + str(i), self.rootNode, ogre.Vector3(0, 2, startz + 100 * i), scn)
                 #self.makeArena(self.rootNode, ogre.Vector3(0, 0, startz + 100 * i), scn, i)
-                makeArena(app, ogre.Vector3(0, 0, startz + 100 * i), i)
+                offset = ogre.Vector3(0, 0, startz + 100 * i)
+                level.offset = offset
+                level.arena = makeArena(app, offset, i)
+                self.levels.append(level)
+
+                #todo: dynamic loading
+                level.load(app)
+                
             elif i == 0:
                 # first room
-                self.playerStarts.append(ogre.Vector3(0, 4, startz + 25 + 100 * i))
-                makeStartRoom(app, ogre.Vector3(0, 0, startz + 25 + 100 * i), i)
-            elif i == rooms + 1:
+                level = BaseLevel(i)
+                level.cameraPosition = ogre.Vector3(0, 0, startz + 100 * i)
+                level.playerStart = ogre.Vector3(0, 4, startz + 25 + 100 * i)
+                level.arena = makeStartRoom(app, ogre.Vector3(0, 0, startz + 25 + 100 * i), i)
+                self.levels.append(level)
+            elif i == n + 1:
                 # final room
-                print 'i:', i
-                self.playerStarts.append(ogre.Vector3(0, 4, startz - 125 + 100 * i))
-                makeEndRoom(app, ogre.Vector3(0, 0, startz - 25 + 100 * i), i)
+                level = BaseLevel(i)
+                level.cameraPosition = ogre.Vector3(0, 0, startz + 100 * i)
+                level.playerStart = ogre.Vector3(0, 4, startz - 125 + 100 * i)
+                level.arena = makeEndRoom(app, ogre.Vector3(0, 0, startz - 25 + 100 * i), i)
+                self.levels.append(level)
 
         #(leftDoor, rightDoor) = makeSwingingDoors(app, ogre.Vector3(0, 0, 25))
 
 
     def initSounds(self, app):
-        self.plsounds = {}
-        self.sounds = {}
-        self.music = {}
-
         sm = app.soundManager
         self.mm = app.musicManager
 
         self.mm.setTempo(self.tempo)
         
         # grab our background tracks
-        self.music['bg-1'] = sm.createSound('bg-1', 'level-0-1.wav', True)
-        self.music['bg-2'] = sm.createSound('bg-2', 'level-0-2.wav', True)
-        self.music['bg-3'] = sm.createSound('bg-3', 'level-0-3.wav', True)
-        self.music['bg-4'] = sm.createSound('bg-4', 'level-0-4.wav', True)
+        app.music['bg-1'] = sm.createSound('bg-1', 'level-0-1.wav', True)
+        app.music['bg-2'] = sm.createSound('bg-2', 'level-0-2.wav', True)
+        app.music['bg-3'] = sm.createSound('bg-3', 'level-0-3.wav', True)
+        app.music['bg-4'] = sm.createSound('bg-4', 'level-0-4.wav', True)
+
+        self.defaultBackgroundMusic = app.music['bg-1']
 
         # set all music tracks relative to the listener
-        for m in self.music.values():
+        for m in app.music.values():
             m.setRelativeToListener(True)
             #m.setGain(0.25)
 
@@ -150,119 +158,95 @@ class LevelManager(OgreOde.CollisionListener, object):
 
         for f in files:
             print 'Loading sound %s' % (f + '.wav')
-            self.sounds[f] = sm.createSound(f, f + '.wav', False)        
+            app.sounds[f] = sm.createSound(f, f + '.wav', False)        
 
             
         # set all sounds relative to the listener
-        for s in self.sounds.values():
+        for s in app.sounds.values():
             s.setRelativeToListener(True)
 
 
-        self.doorSounds = ['bell-hi-0', 'bell-hi-1', 'bell-lo-0', 'bell-lo-1',
-                 'bowen-0', 'bowen-1', 'bowen-2', 'bowen-3',
-                 'neutron-0', 'neutron-1']
-    
-    def setArea(self, area):
+    def setCurrentLevel(self, level):
         '''
-        Set our current area
+        Set our current level
         '''
 
-        if area == self.area:
+        if level == self.currentLevel:
+            print 'Error: entering current level'
             return
 
-        if area < 0:
+        if level < 0:
+            print 'Error: negative level', level
             return
-
+        if level >= len(self.levels):
+            print 'Error: level id too big', level
+            return
         
-        #if area in [1,2,3,4]:
-        #    try: self.particles["StartArrow"] #check to see if particles exist
-        #    except KeyError: #if they don't
-        #        #player has jumped a wall, CHEATER!
-        #        #self.player.warpTo = (self.playerStarts[area-1])
-        #        return 'CHEATER'
-        #    else: #if they do
-        #        self.particles["StartArrow"].particleSystem.removeAllEmitters()
-        #        self.decayParticle = True
-
-        print 'Entering area %d' % area
+        if level <= self.currentLevel:
+            print 'Error: level going backwards'
+            return
+        
+        # warp the character if we're just starting
+        if self.currentLevel == -1:
+            self.player.warpTo = (self.levels[level].playerStart)
+        
+        print 'Entering level %d' % level
 
         # set the appropriate background music
-        if self.area in [0, 1, 5] and area not in [0, 1, 5]:
-            self.mm.stopSound(self.music['bg-1'], 0)
-        elif self.area == 2:
-            self.mm.stopSound(self.music['bg-2'], 0)
-        elif self.area == 3:
-            self.mm.stopSound(self.music['bg-3'], 0)
-        elif self.area == 4:
-            self.mm.stopSound(self.music['bg-4'], 0)
+        if self.currentLevel > 0 and self.levels[self.currentLevel].backgroundMusic:
+            self.mm.stopSound(self.levels[self.currentLevel].backgroundMusic, 0)
+        else:
+            self.mm.stopSound(self.defaultBackgroundMusic, 0)
 
-        if area in [0, 1, 5] and self.area not in [0, 1, 5]:
-            self.mm.addQueuedSound(self.music['bg-1'], self.mm.totalBeats)
-        elif area == 2:
-            self.mm.addQueuedSound(self.music['bg-2'], self.mm.totalBeats)
-        elif area == 3:
-            self.mm.addQueuedSound(self.music['bg-3'], self.mm.totalBeats)
-        elif area == 4:
-            self.mm.addQueuedSound(self.music['bg-4'], self.mm.totalBeats)
+        self.currentLevel = level
 
-        # warp the character if we're just starting
-        if self.area == -1:
-            self.player.warpTo = (self.playerStarts[area])
+        if self.levels[self.currentLevel].backgroundMusic:
+            self.mm.addQueuedSound(self.levels[self.currentLevel].backgroundMusic, self.mm.totalBeats)
+        else:
+            self.mm.addQueuedSound(self.defaultBackgroundMusic, self.mm.totalBeats)
+        
 
-        self.area = area
-
+        
         # move the camera
-        if self.area == 0 :
-            return # Don't animate the camera to start
-        #self.camera.setPosition(self.cameraPositions[self.area])
-        
-        node = self.camera.getParentSceneNode()
-
-        sceneManager = node.getCreator()
-
-        # animation code adapted from Demo_CameraTracking.py
-
-        if sceneManager.hasAnimation('CameraTrack'):
-            print 'destroying old CameraTrack'
-
-            as = sceneManager.getAnimationState('CameraTrack')
-            as.setEnabled(False)
-            self.animations.remove(as)
+        if self.currentLevel != 0: # Don't animate the camera to start
             
-            sceneManager.destroyAnimationState('CameraTrack')
-            sceneManager.destroyAnimation('CameraTrack')
+            #self.camera.setPosition(self.cameraPositions[self.area])
             
+            node = self.camera.getParentSceneNode()
+
+            sceneManager = node.getCreator()
+
+            # animation code adapted from Demo_CameraTracking.py
+
+            if sceneManager.hasAnimation('CameraTrack'):
+                print 'destroying old CameraTrack'
+
+                as = sceneManager.getAnimationState('CameraTrack')
+                as.setEnabled(False)
+                self.animations.remove(as)
+                
+                sceneManager.destroyAnimationState('CameraTrack')
+                sceneManager.destroyAnimation('CameraTrack')
+                
+            
+            animation = sceneManager.createAnimation('CameraTrack', 2)
+            animation.interpolationMode = ogre.Animation.IM_SPLINE
+            
+            animationTrack = animation.createNodeTrack(0, node)
+            
+            key = animationTrack.createNodeKeyFrame(0)
+            key.setTranslate(node.getPosition())
+            
+            key = animationTrack.createNodeKeyFrame(2)
+            #key.setTranslate (self.levels[self.currentLevel].cameraPosition - self.camera.getPosition())
+            key.setTranslate(node.getPosition() + ogre.Vector3().UNIT_Z*100)
+            animationState = sceneManager.createAnimationState('CameraTrack')
+            animationState.setEnabled(True)
+            animationState.setLoop(False)
+
+            self.animations.append(animationState)
+
         
-        animation = sceneManager.createAnimation('CameraTrack', 2)
-        animation.interpolationMode = ogre.Animation.IM_SPLINE
-        
-        animationTrack = animation.createNodeTrack(0, node)
-        
-        key = animationTrack.createNodeKeyFrame(0)
-        key.setTranslate(node.getPosition())
-        
-        key = animationTrack.createNodeKeyFrame(2)
-        #NJRTODO
-        #key.setTranslate (self.cameraPositions[self.area] - self.camera.getPosition())
-        key.setTranslate(node.getPosition() + ogre.Vector3().UNIT_Z*100)
-        animationState = sceneManager.createAnimationState('CameraTrack')
-        animationState.setEnabled(True)
-        animationState.setLoop(False)
-
-        self.animations.append(animationState)
-
-        
-    def triggerRandomSounds(self):
-
-        numSounds = random.randint(3, 10)
-
-        print 'Queing %d random sounds' % numSounds
-
-        sounds = random.sample(self.sounds.values(), numSounds)
-
-        for sound in sounds:
-            self.mm.addQueuedSound(sound, random.choice([2, 4]), random.choice([8, 4, None, None, None]))
-
     # 
     # Called by OgreOde whenever a collision occurs, so 
     # that we can modify the contact parameters
@@ -304,9 +288,9 @@ class LevelManager(OgreOde.CollisionListener, object):
                 c2 = containers[u2]
                 
                 # we've got two Container objects, now we can collide them with each other (maybe)
-
-                col1 = c1.collide(c2, contact, contact.getNormal())
-                col2 = c2.collide(c1, contact, -contact.getNormal())
+                #print 'Colliding ' + c1.name + ' against ' + c2.name
+                col1 = c1.collide(c2, contact, contact.getNormal(), self)
+                col2 = c2.collide(c1, contact, -contact.getNormal(), self)
 
                 if col1 or col2:
                     # if either of the collisions is true, we're OK
@@ -558,5 +542,6 @@ class LevelManager(OgreOde.CollisionListener, object):
         scn.destroySceneNode(c.node.getName())
         self.particles.clear()
 
-
+    def resetPlayer(self):
+        self.player.warpTo = self.levels[self.currentLevel].playerStart
 

@@ -141,7 +141,7 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
             if self.fov > 60: self.fov = 60
             self.camera.setFOVy(ogre.Radian(ogre.Degree(self.fov)))
         
-            p_0 = self.level.cameraPositions[self.level.area]
+            p_0 = self.level.levels[self.level.currentLevel].cameraPosition
             #p_0 = ogre.Vector3.ZERO
             
             radius = 300.0
@@ -151,8 +151,8 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         
             #print p_0
             #print p_1
-            print "self.azimuth [%d]" % self.azimuth
-            print "self.altitude [%d]" % self.altitude
+            #print "self.azimuth [%d]" % self.azimuth
+            #print "self.altitude [%d]" % self.altitude
             
             #self.camera.moveRelative(ogre.Vector3(self.xcAxis, -self.ycAxis,0.0))
             node = self.camera.getParentSceneNode()
@@ -545,6 +545,8 @@ class GomApplication(sf.Application, object):
         self.level = None
         self.player = None
         self.lights = []
+        self.music = {}
+        self.sounds = {}
         
         sf.Application.__init__(self)
 
@@ -574,6 +576,8 @@ class GomApplication(sf.Application, object):
         print 'music--'
         del self.musicManager
         del self._musicThread
+        del self.sounds
+        del self.music
 
         print 'pre-del'
         sf.Application.__del__(self)
@@ -643,7 +647,7 @@ class GomApplication(sf.Application, object):
         self.player.geom.setUserData(self.player.id)
 
         # create an invisible bottom floor 10 units down, completely flat
-        self._plane = Container('Infinite Plane')
+        self._plane = GroundPlane('Infinite Plane')
         containers[self._plane.id] = self._plane
         self._plane.geom = OgreOde.InfinitePlaneGeometry(ogre.Plane(ogre.Vector3(0, 1, 0), -10), self._world, self._space)
         self._plane.geom.setUserData(self._plane.id)
