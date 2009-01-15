@@ -282,14 +282,8 @@ class LevelManager(OgreOde.CollisionListener, object):
                 # we've got two Container objects, now we can collide them with each other (maybe)
                 #print 'Colliding ' + c1.name + ' against ' + c2.name
                 col1 = c1.collide(c2, contact, contact.getNormal(), self)
-                col2 = c2.collide(c1, contact, -contact.getNormal(), self)
 
-                if col1 or col2:
-                    # if either of the collisions is true, we're OK
-                    return True
-                else:
-                    return False
-                
+                return col1
 
     def collideWithDoor(self, me, other, contact, normal):
 

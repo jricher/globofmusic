@@ -22,6 +22,9 @@ class Level(BaseLevel):
         crate = makeCrate(app, 'Bob Crate', self.offset + ogre.Vector3(0, 2, 0))
         crate.sound = app.sounds['bell-lo-0']
 
+        platform = makePlatform(app, 'Bob Platform', self.offset + ogre.Vector3(10, 1, 0))
+        platform.sound = app.sounds['key-1']
+        
 
     def unload(self, app):
         pass

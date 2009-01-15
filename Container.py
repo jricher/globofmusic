@@ -28,7 +28,7 @@ class Container(object):
         self.rest = None # MusicManager post-sound rest
         self.name = name  # name to refer to this by
         self.anim = None # animation
-        self.friction = 50
+        self.friction = 500
         self.bouncy = 0.1
         
         self.id = _mkId() # unique ID (useful for setUserData calls)
@@ -100,14 +100,21 @@ class Container(object):
     def collide(self, other, contact, normal, lm):
         # by default, everything's collidable
 
-        contact.setCoulombFriction(max(self.friction, other.friction))
-        contact.setBouncyness(max(self.bouncy, other.bouncy))
+        #contact.setCoulombFriction(max(self.friction, other.friction))
+        #contact.setBouncyness(max(self.bouncy, other.bouncy))
+
+        if not other.collideWith(self, contact, -normal, lm):
+            contact.setCoulombFriction(self.friction)
+            contact.setBouncyness(self.bouncy)
 
         # make a noise if the player hits it
-        if isinstance(other, Player) and self.sound:
+        if self.sound and isinstance(other, Player):
             lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
 
         return True
+
+    def collideWith(self, other, contact, normal, lm):
+        return False
 
 def _mkId():
     '''
@@ -150,7 +157,15 @@ class Player(Container):
 
         self.jumpTime = 0.050 # jump for just a bit
 
-        # the player object isn't collidable on its own
+        return Container.collide(self, other, contact, normal, lm)
+                    
+    def collideWith(self, other, contact, normal, lm):
+        # take care of jumping, that's it
+        if normal != self.jumpVector:
+            self.jumpVector = normal
+
+        self.jumpTime = 0.050 # jump for just a bit
+
         return False
                     
 
@@ -259,14 +274,17 @@ class Fireable(Container):
 
 
     def collide(self, other, contact, normal, lm):
-        if self.arm():
+        if isinstance(other, Player) and self.arm():
             if not lm.mm.isFireKeyQueued(self.id):
                 lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
-        return True
+        return Container.collide(self, other, contact, normal, lm)
         
-
-    
-
+    def collideWith(self, other, contact, normal, lm):
+        if isinstance(other, Player) and self.arm():
+            if not lm.mm.isFireKeyQueued(self.id):
+                lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
+        return False
+        
 class Platform(Fireable):
     def __init__(self, name = None, materialName = None, restartable = False, key = None):
         Fireable.__init__(self, name, materialName, restartable, key)
@@ -328,14 +346,32 @@ class ArenaFloor(Container):
             if lm.currentLevel is not self.arenaId :
                 lm.setCurrentLevel(self.arenaId)
     
-        ## Yes, this collision is valid
-        return True
+            ## Yes, this collision is valid
+            return True
+        else:
+            return Container.collide(self, other, contact, normal, lm)
+        
+    def collideWith(self, other, contact, normal, lm):
+        if isinstance(other, Player):
+            # floors are pretty sticky
+            contact.setCoulombFriction( 9999999999 )    ### OgreOde.Utility.Infinity)
+            contact.setBouncyness(0.4)
+
+            if lm.currentLevel is not self.arenaId :
+                lm.setCurrentLevel(self.arenaId)
+    
+            ## Yes, we changed things
+            return True
+        else:
+            return False
         
 
 class ArenaWalls(Container):
     def __init__(self, name, arenaId):
         Container.__init__(self, name)
         self.arenaId = arenaId
+        self.friction = 100
+        self.bouncy = 0.7
 
     def __del__(self):
         if not Container:
@@ -344,8 +380,13 @@ class ArenaWalls(Container):
         del self.arenaId
 
     def collide(self, other, contact, normal, lm):
-        contact.setCoulombFriction( 10 )    # walls are pretty slick
-        contact.setBouncyness(0.9)
+        contact.setCoulombFriction(self.friction)    # walls are pretty slick
+        contact.setBouncyness(self.bouncy)
+        return True
+
+    def collideWith(self, other, contact, normal, lm):
+        contact.setCoulombFriction(self.friction)    # walls are pretty slick
+        contact.setBouncyness(self.bouncy)
         return True
 
 class Arena(object):
@@ -372,6 +413,11 @@ class GroundPlane(Container):
         if isinstance(other, Player):
             lm.resetPlayer()
         return True
+
+    def collideWith(self, other, contact, normal, lm):
+        if isinstance(other, Player):
+            lm.resetPlayer()
+        return False
     
 class Door(Container):
     def __init__(self, name):
@@ -487,10 +533,6 @@ def makeArena(app, offset, i):
     wall.node.attachObject(wall.ent)
 
     wall.ent.setCastShadows(False)
-    
-    # set the wall color properly
-    sub = wall.ent.getSubEntity(0)
-    #sub.materialName = 'wall%d' % ((i) % 4)
     
     # copied from SimpleScenes_TriMesh, there's probably a much more efficient way to do this
     ei = OgreOde.EntityInformer(wall.ent, wall.node._getFullTransform())
@@ -662,6 +704,31 @@ def makeEndRoom(app, offset, i):
 
     return Arena(floor, walls, i)
     
+
+def makePlatform(app, name, offset, material='platform0-'):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    
+    c = Platform(name = name, materialName = material)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'platform.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.setPosition(offset)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.ent.setUserObject(c.geom)
+    
+    # set the initial material
+    c.setMaterial()
+
+    c.geom.setUserData(c.id)
+
+    return c
 
 def makeTiltingPlatform(app, name, offset, material='platform0-'):
     scn = app.sceneManager
