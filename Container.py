@@ -486,6 +486,7 @@ class BaseLevel(object):
         self.backgroundMusic = None
         self.arena = None
         self.offset = None
+        self.startLevelCallback = None
         
     def __del__(self):
         del self.levelId
@@ -494,6 +495,7 @@ class BaseLevel(object):
         del self.backgroundMusic
         del self.arena
         del self.offset
+        del self.startLevelCallback
 
 # creation functions
 def makeArena(app, offset, i):
@@ -596,6 +598,37 @@ def makeCrate(app, name, position):
     c.body = ei.createSingleDynamicBox(0.5, app._world, app._space)
     #c.body.setDamping(2,2)
     #c.body.sleep() # put the crates to sleep until we need them
+    c.geom = c.body.getGeometry(0)
+
+    c.geom.setUserData(c.id)
+    
+    return c
+
+def makeSleepyCrate(app, name, position):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    
+    c = Fireable(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, "Cube.mesh")
+    #c.ent.setNormaliseNormals(True)
+    c.ent.setCastShadows(True)
+    #c.ent.setScale(4, 4, 4)
+
+    #sub = c.ent.getSubEntity(0)
+    #sub.materialName = 'Ac3d/Door/Mat001_Tex00' # look like a door
+
+    c.node = root.createChildSceneNode(c.ent.getName())
+    c.node.attachObject(c.ent)
+
+    c.node.setPosition(position)
+
+    c.node.setScale(2, 2.5, 2)
+
+    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    c.body = ei.createSingleDynamicBox(50.5, app._world, app._space)
+    c.body.setDamping(2,2)
+    c.body.sleep() # put the crates to sleep until we need them
     c.geom = c.body.getGeometry(0)
 
     c.geom.setUserData(c.id)
@@ -766,7 +799,44 @@ def makeTiltingPlatform(app, name, offset, material='platform0-'):
     c.geom.setUserData(c.id)
 
     return c
+
+def makePlatform(app, name, offset, mass=20.0, fixed=True, material='platform0-'):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
     
+    c = Platform(name = name, materialName = material)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'platform.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
+    c.node.attachObject(c.body)
+    mass = OgreOde.BoxMass (mass, ei.getSize())
+    mass.setDensity(5.0, ei.getSize())
+    c.body.setMass(mass)
+    
+    c.geom.setBody(c.body)
+    c.ent.setUserObject(c.geom)
+    
+    c.body.setPosition(offset)
+    
+    if (fixed):
+        c.joint = OgreOde.FixedJoint(app._world)
+        c.joint.attach(c.body)
+        c.joint.setAnchor(offset)
+
+    # set the initial material
+    c.setMaterial()
+
+    c.geom.setUserData(c.id)
+
+    return c    
 
 def makeSwingingDoors(app, offset):
     scn = app.sceneManager

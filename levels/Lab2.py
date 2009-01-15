@@ -19,11 +19,15 @@ class Level(BaseLevel):
 
         self.backgroundMusic = app.music['bg-3']
 
-        crate = makeCrate(app, 'Lab2 Crate', self.offset + ogre.Vector3(0, 2, 0))
+        crate = makeSleepyCrate(app, 'Lab2 Crate', self.offset + ogre.Vector3(0, 1.3, 0))
         crate.sound = app.sounds['bell-lo-0']
+        crate2 = makeSleepyCrate(app, 'Lab2 Crate2', self.offset + ogre.Vector3(0, 3.8, 0))
         
-        platform = makeTiltingPlatform(app, "Lab2 Platform", self.offset + ogre.Vector3(-5,5,0) )
+        
+        platform = makePlatform(app, "Lab2 Platform", self.offset + ogre.Vector3(0,5,-30) )
         platform.sound = app.sounds['neutron-0']
+        
+        
 
 
     def unload(self, app):

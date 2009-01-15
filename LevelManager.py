@@ -123,6 +123,23 @@ class LevelManager(OgreOde.CollisionListener, object):
                 level.cameraAnchor = ogre.Vector3(0, 0, startz + 100 * i)
                 level.playerStart = ogre.Vector3(0, 4, startz - 125 + 100 * i)
                 level.arena = makeEndRoom(app, ogre.Vector3(0, 0, startz - 25 + 100 * i), i)
+                def fireworks():
+                    if (not self.particles.has_key("Fireworks")):
+                        scn = self.rootNode.getCreator()
+                        c = Container("Fireworks")
+                        c.particleSystem = scn.createParticleSystem('fireworks', 'Examples/njrFireworks')
+                        c.particleSystem.setKeepParticlesInLocalSpace(True)
+                    
+                        c.node = self.rootNode.createChildSceneNode("Fireworks")
+                        #c.node.setPosition(0, 0, 375)
+                        c.node.setPosition(ogre.Vector3(0,0,startz - 25 + 100*i))
+                    
+                        c.node.attachObject(c.particleSystem)
+                    
+                        self.particles["Fireworks"] = c
+                                
+                level.startLevelCallback = fireworks
+                    
                 self.levels.append(level)
 
         #(leftDoor, rightDoor) = makeSwingingDoors(app, ogre.Vector3(0, 0, 25))
@@ -237,6 +254,9 @@ class LevelManager(OgreOde.CollisionListener, object):
             animationState.setLoop(False)
 
             self.animations.append(animationState)
+            if (self.levels[self.currentLevel].startLevelCallback):
+                self.levels[self.currentLevel].startLevelCallback()
+                
 
         
     # 
