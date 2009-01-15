@@ -27,7 +27,7 @@ from Container import *
 from threading import Thread
 import time
 
-import Level0
+from LevelManager import LevelManager
 
 import modulefinder
 import levels
@@ -529,10 +529,6 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
             if "D_Right" in self.buttons: self.xcAxis = 1.0
             #self.camera.moveRelative(translate)
             
-            #Domino Reset
-            # NOTE: this is very Level0 specific, for debug purposes only
-            if "Back" in self.buttons: self.level.resetDominoes()
-            
             if "Start" in self.buttons:
                 self.player.warpTo = self.level.playerStarts[self.level.area]
             if "Black" in self.buttons: self.zcAxis = 1
@@ -668,9 +664,7 @@ class GomApplication(sf.Application, object):
             exec 'print x, dir(levels.' + x + ')'
             exec 'll.append(levels.' + x + ')'
 
-        self.level = Level0.load(self, ll)
-
-        self.level.setArea(0)
+        self.level = LevelManager(self, ll)
 
         ###
         ### 

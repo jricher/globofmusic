@@ -1,14 +1,9 @@
 ##
 ## Glob of Music
-## Copyright 2007
-##  Justin Richer
-##  Nathan Rackliffe
-##  Paul Laidler
-##  Rob Whalen
 ##
 
 #
-# Level 0 of the Glob of Music game
+# Level Manager
 #
 
 import ogre.renderer.OGRE as ogre
@@ -25,10 +20,7 @@ import time
 
 import random
 
-def load(app, roomList):
-    return Level0(app, roomList)
-
-class Level0(OgreOde.CollisionListener, object):
+class LevelManager(OgreOde.CollisionListener, object):
     def __init__(self, app, roomList):
         OgreOde.CollisionListener.__init__(self)
 
@@ -62,6 +54,8 @@ class Level0(OgreOde.CollisionListener, object):
         self.initSounds(app)
 
         self.initGraphics(app, roomList)
+
+        self.setArea(0)
 
         
     def __del__(self):
@@ -121,7 +115,7 @@ class Level0(OgreOde.CollisionListener, object):
                 self.playerStarts.append(ogre.Vector3(0, 4, startz - 125 + 100 * i))
                 makeEndRoom(app, ogre.Vector3(0, 0, startz - 25 + 100 * i), i)
 
-        (leftDoor, rightDoor) = makeSwingingDoors(app, ogre.Vector3(0, 0, 25))
+        #(leftDoor, rightDoor) = makeSwingingDoors(app, ogre.Vector3(0, 0, 25))
 
 
     def initSounds(self, app):
