@@ -108,7 +108,7 @@ class Container(object):
             contact.setBouncyness(self.bouncy)
 
         # make a noise if the player hits it
-        if self.sound and isinstance(other, Player):
+        if self.sound and isinstance(other, Player) and not lm.mm.isSoundQueued(self.sound):
             lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
 
         return True
@@ -275,13 +275,13 @@ class Fireable(Container):
 
     def collide(self, other, contact, normal, lm):
         if isinstance(other, Player) and self.arm():
-            if not lm.mm.isFireKeyQueued(self.id):
+            if self.sound and not lm.mm.isFireKeyQueued(self.id):
                 lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
         return Container.collide(self, other, contact, normal, lm)
         
     def collideWith(self, other, contact, normal, lm):
         if isinstance(other, Player) and self.arm():
-            if not lm.mm.isFireKeyQueued(self.id):
+            if self.sound and not lm.mm.isFireKeyQueued(self.id):
                 lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
         return False
         
@@ -510,7 +510,7 @@ def makeArena(app, offset, i):
     containers[floor.id] = floor
     floor.ent = scn.createEntity('ArenaFloor%d' % i, 'ArenaFloor.mesh')
     floor.node = root.createChildSceneNode('ArenaFloor%d' % i)
-    floor.node.setPosition(ogre.Vector3() + offset)
+    floor.node.setPosition(offset)
     floor.node.attachObject(floor.ent)
 
     floor.ent.setCastShadows(False)
@@ -531,7 +531,7 @@ def makeArena(app, offset, i):
     containers[wall.id] = wall
     wall.ent = scn.createEntity('ArenaWall%d' % i, 'ArenaWalls.mesh')
     wall.node = root.createChildSceneNode('ArenaWall%d' % i)
-    wall.node.setPosition(ogre.Vector3() + offset)
+    wall.node.setPosition(offset)
     wall.node.attachObject(wall.ent)
 
     wall.ent.setCastShadows(False)
