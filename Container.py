@@ -248,7 +248,7 @@ class Fireable(Container):
 
             if self.key:
                 # tell our key that we've fired
-                self.key.platformFired(self)
+                self.key.sourceFired(self)
             if self.fireCallback:
                 self.fireCallback()
             
@@ -293,26 +293,41 @@ class Platform(Fireable):
             return
         Fireable.__del__(self)
 
-                
-class MultiKey(object):
+class Key(Fireable):
+    def __init__(self, name = None, materialName = 'keys-'):
+        Fireable.__init__(self, name, materialName)
+    def __del__(self):
+        if not Fireable:
+            return
+        Fireable.__del__(self)
+
+    def setMaterial(self):
+        if self.ent and self.materialName and self.state != 'waiting':
+            n = self.ent.getNumSubEntities()
+            for i in range(n):
+                sub = self.ent.getSubEntity(i)
+                sub.materialName = self.materialName + self.state
+
+               
+class MultiPartLock(object):
     def __init__(self, name = None):
         self.name = name
         self.doors = []
-        self.platforms = []
+        self.sources = []
         self.unlockCallback = None
 
     def __del__(self):
         del self.name
         del self.doors[:]
-        del self.platforms[:]
+        del self.sources[:]
         del self.unlockCallback
         
-    def platformFired(self, source):
+    def sourceFired(self, source):
         '''
         Call when a platform has fired, will unlock all doors if all platforms have fired
         '''
         unlock = source.isFired()
-        for p in self.platforms:
+        for p in self.sources:
             # will turn true as long as all platforms have fired
             #print '%s fired? %s' % (str(p.name), str(p.isFired()))
             unlock = (unlock and p.isFired()) or (unlock and p.isDone())
@@ -678,19 +693,38 @@ def makeStartRoom(app, offset, i):
     walls.geom.setUserData(walls.id)
     
     #Starting Room platform
-    key = MultiKey()
-    c = makeTiltingPlatform(app, 'StatringRoom Platform0', offset + ogre.Vector3(0, 2, -10))
+    key = MultiPartLock()
 
+    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, -10))
     c.sound = app.sounds['key-0']
     c.quant = 8
-    
     c.key = key
-    key.platforms.append(c)
+    key.sources.append(c)
+
+    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, 10))
+    c.sound = app.sounds['key-1']
+    c.quant = 8
+    c.key = key
+    key.sources.append(c)
+
+    c = makeUnlockKey(app, offset + ogre.Vector3(10, 2, 0))
+    c.sound = app.sounds['key-2']
+    c.quant = 8
+    c.key = key
+    key.sources.append(c)
+
+    c = makeUnlockKey(app, offset + ogre.Vector3(-10, 2, 0))
+    c.sound = app.sounds['key-3']
+    c.quant = 8
+    c.key = key
+    key.sources.append(c)
+
+
 
     (leftDoor, rightDoor) = makeSwingingDoors(app, offset)
-    #leftDoor.lock(self._world)
+    leftDoor.lock(app._world)
     rightDoor.lock(app._world)
-    #key.doors.append(leftDoor)
+    key.doors.append(leftDoor)
     key.doors.append(rightDoor)
 
     return Arena(floor, walls, i)
@@ -865,3 +899,66 @@ def makeSwingingDoors(app, offset):
     return doors
 
 
+def makeUnlockKey(app, offset):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    
+    name = 'Key:' + str(offset)
+
+    c = Key(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'Key.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
+    c.node.attachObject(c.body)
+    mass = OgreOde.BoxMass (5.0, ei.getSize()) ## TODO: make it the sphere mass
+    mass.setDensity(5.0, ei.getSize())
+    c.body.setMass(mass)
+    
+    c.geom.setBody(c.body)
+    c.ent.setUserObject(c.geom)
+    
+    c.body.setPosition(offset)
+
+    c.joint = OgreOde.BallJoint(app._world)
+    c.joint.attach(c.body)
+    c.joint.setAnchor(offset)
+
+    # set the initial material
+    c.setMaterial()
+
+    c.geom.setUserData(c.id)
+
+    return c
+##    scn = app.sceneManager
+##    root = scn.getRootSceneNode()
+##
+##    name = 'Key:' + str(offset)
+##
+##    c = Key(name)
+##    containers[c.id] = c
+##
+##    c.ent = scn.createEntity(name, 'Key.mesh')
+##    c.node = root.createChildSceneNode()
+##
+##    c.node.attachObject(c.ent)
+##    c.node.setPosition(offset)
+##
+##    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+##    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+##
+##    c.geom.setUserData(c.id)
+##
+##    return c
+##
+##    
+##
+##
+##    
