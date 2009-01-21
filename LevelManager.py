@@ -116,6 +116,8 @@ class LevelManager(OgreOde.CollisionListener, object):
                 level.cameraAnchor = ogre.Vector3(0, 0, startz + 100 * i)
                 level.playerStart = ogre.Vector3(0, 4, startz + 25 + 100 * i)
                 level.arena = makeStartRoom(app, ogre.Vector3(0, 0, startz + 25 + 100 * i), i)
+               
+                #level.startLevelCallback = self.smoke
                 self.levels.append(level)
             elif i == n + 1:
                 # final room
@@ -123,22 +125,7 @@ class LevelManager(OgreOde.CollisionListener, object):
                 level.cameraAnchor = ogre.Vector3(0, 0, startz + 100 * i)
                 level.playerStart = ogre.Vector3(0, 4, startz - 125 + 100 * i)
                 level.arena = makeEndRoom(app, ogre.Vector3(0, 0, startz - 25 + 100 * i), i)
-                def fireworks():
-                    if (not self.particles.has_key("Fireworks")):
-                        scn = self.rootNode.getCreator()
-                        c = Container("Fireworks")
-                        c.particleSystem = scn.createParticleSystem('fireworks', 'Examples/njrFireworks')
-                        c.particleSystem.setKeepParticlesInLocalSpace(True)
-                    
-                        c.node = self.rootNode.createChildSceneNode("Fireworks")
-                        #c.node.setPosition(0, 0, 375)
-                        c.node.setPosition(ogre.Vector3(0,0,startz - 25 + 100*i))
-                    
-                        c.node.attachObject(c.particleSystem)
-                    
-                        self.particles["Fireworks"] = c
-                                
-                level.startLevelCallback = fireworks
+                level.startLevelCallback = self.fireworks
                     
                 self.levels.append(level)
 
@@ -218,6 +205,10 @@ class LevelManager(OgreOde.CollisionListener, object):
         else:
             self.mm.addQueuedSound(self.defaultBackgroundMusic, self.mm.totalBeats)
         
+        #trigger any animation
+        if (self.levels[self.currentLevel].startLevelCallback):
+                self.levels[self.currentLevel].startLevelCallback(self.levels[self.currentLevel])
+        
         # move the camera
         if self.currentLevel != 0: # Don't animate the camera to start
             
@@ -254,8 +245,7 @@ class LevelManager(OgreOde.CollisionListener, object):
             animationState.setLoop(False)
 
             self.animations.append(animationState)
-            if (self.levels[self.currentLevel].startLevelCallback):
-                self.levels[self.currentLevel].startLevelCallback()
+            
                 
 
         
@@ -506,19 +496,50 @@ class LevelManager(OgreOde.CollisionListener, object):
             
         # TODO: animate fading ramp
 
-    def fireworks(self):
-        scn = self.rootNode.getCreator()
-        c = Container("Fireworks")
-        c.particleSystem = scn.createParticleSystem('fireworks', 'Examples/njrFireworks')
-        c.particleSystem.setKeepParticlesInLocalSpace(True)
+#    def fireworks(self):
+#        scn = self.rootNode.getCreator()
+#        c = Container("Fireworks")
+#        c.particleSystem = scn.createParticleSystem('fireworks', 'Examples/njrFireworks')
+#        c.particleSystem.setKeepParticlesInLocalSpace(True)
+#        
+#        c.node = self.rootNode.createChildSceneNode("Fireworks")
+#        c.node.setPosition(0, 0, 375)
+#        
+#        c.node.attachObject(c.particleSystem)
+#        
+#        self.particles["Fireworks"] = c
         
-        c.node = self.rootNode.createChildSceneNode("Fireworks")
-        c.node.setPosition(0, 0, 375)
+    def fireworks(self, level):
+        if (not self.particles.has_key("Fireworks")):
+            scn = self.rootNode.getCreator()
+            c = Container("Fireworks")
+            c.particleSystem = scn.createParticleSystem('fireworks', 'Examples/njrFireworks')
+            c.particleSystem.setKeepParticlesInLocalSpace(True)
         
-        c.node.attachObject(c.particleSystem)
+            c.node = self.rootNode.createChildSceneNode("Fireworks")
+            #c.node.setPosition(0, 0, 375)
+            c.node.setPosition(ogre.Vector3(0,0,level.cameraAnchor))
         
-        self.particles["Fireworks"] = c
+            c.node.attachObject(c.particleSystem)
         
+            self.particles["Fireworks"] = c
+    def smoke(self, level):
+        if (not self.particles.has_key("Smoke")):
+            scn = self.rootNode.getCreator()
+            c = Container("Smoke")
+            c.particleSystem = scn.createParticleSystem('smoke', 'Snow')
+            c.particleSystem.setKeepParticlesInLocalSpace(True)
+            
+            c.node = self.rootNode.createChildSceneNode("Smoke")
+            #c.node = self.player.node.createChildSceneNode("Smoke")  #for extra kicks, attach to the player
+            #c.node.setPosition(0, 0, 375)
+            print "Smoke: ", level.cameraAnchor.x, level.cameraAnchor.y, level.cameraAnchor.z
+            c.node.setPosition(level.cameraAnchor + ogre.Vector3(0,0,25))
+            
+            c.node.attachObject(c.particleSystem)
+            
+            self.particles["Smoke"] = c
+            
     def startingArrow(self, offset):
         scn = self.rootNode.getCreator()
         

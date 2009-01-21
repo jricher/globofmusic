@@ -639,8 +639,9 @@ def makeSleepyCrate(app, name, position):
     c.ent.setCastShadows(True)
     #c.ent.setScale(4, 4, 4)
 
-    #sub = c.ent.getSubEntity(0)
+    sub = c.ent.getSubEntity(0)
     #sub.materialName = 'Ac3d/Door/Mat001_Tex00' # look like a door
+    sub.materialName = 'Examples/Chrome' # look like a door
 
     c.node = root.createChildSceneNode(c.ent.getName())
     c.node.attachObject(c.ent)
@@ -650,7 +651,7 @@ def makeSleepyCrate(app, name, position):
     c.node.setScale(2, 2.5, 2)
 
     ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-    c.body = ei.createSingleDynamicBox(50.5, app._world, app._space)
+    c.body = ei.createSingleDynamicBox(5.5, app._world, app._space)
     c.body.setDamping(2,2)
     c.body.sleep() # put the crates to sleep until we need them
     c.geom = c.body.getGeometry(0)
