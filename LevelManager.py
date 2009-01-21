@@ -14,6 +14,7 @@ import SampleFramework as sf
 
 from MusicManager import MusicManager
 from Container import *
+from Catalog import *
 
 from threading import Thread
 import time
@@ -518,7 +519,7 @@ class LevelManager(OgreOde.CollisionListener, object):
         
             c.node = self.rootNode.createChildSceneNode("Fireworks")
             #c.node.setPosition(0, 0, 375)
-            c.node.setPosition(ogre.Vector3(0,0,level.cameraAnchor))
+            c.node.setPosition(level.cameraAnchor - ogre.Vector3(0,0,25))
         
             c.node.attachObject(c.particleSystem)
         

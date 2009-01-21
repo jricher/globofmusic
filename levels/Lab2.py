@@ -4,6 +4,7 @@ import ogre.sound.OgreAL as OgreAL
 import ogre.io.OIS as OIS
 
 from Container import *
+from Catalog import *
 
 class Level(BaseLevel):
 #    def __init__(self, levelId):

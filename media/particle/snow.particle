@@ -45,6 +45,6 @@ particle_system Snow
 
 	affector DirectionRandomiser
 	{
-		randomness	10
+		randomness	50
 	}
 }
