@@ -104,7 +104,7 @@ class LevelManager(OgreOde.CollisionListener, object):
                 #self.makeArena(self.rootNode, ogre.Vector3(0, 0, startz + 100 * i), scn, i)
                 offset = ogre.Vector3(0, 0, startz + 100 * i)
                 level.offset = offset
-                level.arena = makeArena(app, offset, i)
+                level.arena = makeArena(app, offset, i, level.wide)
                 self.levels.append(level)
 
                 #todo: dynamic loading

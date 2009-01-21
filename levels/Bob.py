@@ -8,6 +8,7 @@ from Container import *
 class Level(BaseLevel):
     def __init__(self, levelId):
         BaseLevel.__init__(self, levelId)
+        self.wide = True
 ##
 ##
 ##    def __del__(self):

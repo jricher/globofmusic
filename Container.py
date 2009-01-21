@@ -11,6 +11,7 @@ import ogre.renderer.OGRE as ogre
 import ogre.physics.OgreOde as OgreOde
 import ogre.sound.OgreAL as OgreAL
 import ogre.io.OIS as OIS
+import random
 
 # A set of generic containers to hold OGRE, ODE, and OpenAL entities in one place
 
@@ -502,6 +503,7 @@ class BaseLevel(object):
         self.arena = None
         self.offset = None
         self.startLevelCallback = None
+        self.wide = False
         
     def __del__(self):
         del self.levelId
@@ -511,9 +513,10 @@ class BaseLevel(object):
         del self.arena
         del self.offset
         del self.startLevelCallback
+        del self.wide
 
 # creation functions
-def makeArena(app, offset, i):
+def makeArena(app, offset, i, wide):
 
     scn = app.sceneManager
     root = scn.getRootSceneNode()
@@ -523,7 +526,10 @@ def makeArena(app, offset, i):
     # set up the arena floors
     floor = ArenaFloor('ArenaFloor%d' % i, i)
     containers[floor.id] = floor
-    floor.ent = scn.createEntity('ArenaFloor%d' % i, 'ArenaFloor.mesh')
+    if wide:
+        floor.ent = scn.createEntity('ArenaFloor%d' % i, 'WideArenaFloor.mesh')
+    else:
+        floor.ent = scn.createEntity('ArenaFloor%d' % i, 'ArenaFloor.mesh')
     floor.node = root.createChildSceneNode('ArenaFloor%d' % i)
     floor.node.setPosition(offset)
     floor.node.attachObject(floor.ent)
@@ -544,7 +550,10 @@ def makeArena(app, offset, i):
     # make some walls
     wall = ArenaWalls('ArenaWall%d' % i, i)
     containers[wall.id] = wall
-    wall.ent = scn.createEntity('ArenaWall%d' % i, 'ArenaWalls.mesh')
+    if wide:
+        wall.ent = scn.createEntity('ArenaWall%d' % i, 'WideArenaWalls.mesh')
+    else:
+        wall.ent = scn.createEntity('ArenaWall%d' % i, 'ArenaWalls.mesh')
     wall.node = root.createChildSceneNode('ArenaWall%d' % i)
     wall.node.setPosition(offset)
     wall.node.attachObject(wall.ent)
@@ -718,8 +727,6 @@ def makeStartRoom(app, offset, i):
     c.quant = 8
     c.key = key
     key.sources.append(c)
-
-
 
     (leftDoor, rightDoor) = makeSwingingDoors(app, offset)
     leftDoor.lock(app._world)
@@ -921,11 +928,16 @@ def makeUnlockKey(app, offset):
     mass = OgreOde.BoxMass (5.0, ei.getSize()) ## TODO: make it the sphere mass
     mass.setDensity(5.0, ei.getSize())
     c.body.setMass(mass)
-    
+
     c.geom.setBody(c.body)
     c.ent.setUserObject(c.geom)
-    
+
     c.body.setPosition(offset)
+    c.body.wake()
+
+    velocity = ogre.Vector3(random.random(), random.random(), random.random())
+    velocity.normalise()
+    c.body.setAngularVelocity(velocity)
 
     c.joint = OgreOde.BallJoint(app._world)
     c.joint.attach(c.body)
@@ -937,28 +949,3 @@ def makeUnlockKey(app, offset):
     c.geom.setUserData(c.id)
 
     return c
-##    scn = app.sceneManager
-##    root = scn.getRootSceneNode()
-##
-##    name = 'Key:' + str(offset)
-##
-##    c = Key(name)
-##    containers[c.id] = c
-##
-##    c.ent = scn.createEntity(name, 'Key.mesh')
-##    c.node = root.createChildSceneNode()
-##
-##    c.node.attachObject(c.ent)
-##    c.node.setPosition(offset)
-##
-##    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-##    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
-##
-##    c.geom.setUserData(c.id)
-##
-##    return c
-##
-##    
-##
-##
-##    
