@@ -19,21 +19,22 @@ class Level(BaseLevel):
         
         #Row 1
         makeCrate(app, 'A Crate', self.offset + ogre.Vector3(140, 5, 20))
-        makePlatform(app, 'A Platform', self.offset + ogre.Vector3(130, 5,20))
-        makeTiltingPlatform(app, "A Tilting Platform", self.offset + ogre.Vector3(120, 5,20))
-        makeIcePlatform(app, 'An Ice Platform', self.offset + ogre.Vector3(100, 5, 20))
+        makePlatform(app, 'A Platform', self.offset + ogre.Vector3(100, 5,20))
+        makeTiltingPlatform(app, "A Tilting Platform", self.offset + ogre.Vector3(70, 5,20))
+        makeIcePlatform(app, 'An Ice Platform', self.offset + ogre.Vector3(20, 5, 20))
         
         #Row 2
         makeOnOffRamp(app, 'An On Off Ramp', self.offset + ogre.Vector3(140, 5, 0))
-        makeStraightRamp(app, 'A Straight Ramp', self.offset + ogre.Vector3(130, 5, 0))
-        makeUpDownRamp(app, 'An Up Down Ramp', self.offset + ogre.Vector3(120, 5, 0))
-        makeCornerRamp(app, 'A Corner Ramp', self.offset + ogre.Vector3(110, 5, 0))
+        makeStraightRamp(app, 'A Straight Ramp', self.offset + ogre.Vector3(120, 5, 0))
+        makeUpDownRamp(app, 'An Up Down Ramp', self.offset + ogre.Vector3(100, 5, 0))
+        makeCornerRamp(app, 'A Corner Ramp', self.offset + ogre.Vector3(80, 5, 0))
+        makeOnOffRamp(app, 'An On Off Ramp turned', self.offset + ogre.Vector3(60, 5, 0), 45)
         
         #Row 3
         makeDomino(app, "A Domino", self.offset + ogre.Vector3(140,5,-20), 0)
-        makeDomino(app, "A Domino Turned", self.offset + ogre.Vector3(130,5,-20), 90)
-        makeUnlockKey(app, self.offset + ogre.Vector3(120,5,-20))
-        makeSwingingDoors(app, self.offset + ogre.Vector3(100,5,-45))
+        makeDomino(app, "A Domino Turned", self.offset + ogre.Vector3(120,5,-20), 90)
+        makeUnlockKey(app, self.offset + ogre.Vector3(100,5,-20))
+        makeSwingingDoors(app, self.offset + ogre.Vector3(80,5,-45))
         
 
     def unload(self, app):

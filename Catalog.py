@@ -5,7 +5,7 @@ import ogre.io.OIS as OIS
 
 from Container import *
 
-def makeArena(app, offset, i, wide):
+def makeArena(app, offset, i, wide, angle=0):
 
     scn = app.sceneManager
     root = scn.getRootSceneNode()
@@ -22,6 +22,8 @@ def makeArena(app, offset, i, wide):
     floor.node = root.createChildSceneNode('ArenaFloor%d' % i)
     floor.node.setPosition(offset)
     floor.node.attachObject(floor.ent)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    floor.node.setOrientation(quat)
 
     floor.ent.setCastShadows(False)
     
@@ -46,6 +48,8 @@ def makeArena(app, offset, i, wide):
     wall.node = root.createChildSceneNode('ArenaWall%d' % i)
     wall.node.setPosition(offset)
     wall.node.attachObject(wall.ent)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    wall.node.setOrientation(quat)
 
     wall.ent.setCastShadows(False)
     
@@ -86,9 +90,10 @@ def makeBlockingWall(app, offset, i):
     
     return c
 
-def makeCrate(app, name, position):
+def makeCrate(app, name, position, angle=0):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
+    name = name + str(position)
     
     c = Fireable(name)
     containers[c.id] = c
@@ -102,9 +107,11 @@ def makeCrate(app, name, position):
 
     c.node = root.createChildSceneNode(c.ent.getName())
     c.node.attachObject(c.ent)
+    
 
     c.node.setPosition(position)
-
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
     c.node.setScale(2, 2.5, 2)
 
     ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
@@ -120,6 +127,7 @@ def makeCrate(app, name, position):
 def makeSleepyCrate(app, name, position):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
+    name = name + str(position)
     
     c = Fireable(name)
     containers[c.id] = c
@@ -140,7 +148,7 @@ def makeSleepyCrate(app, name, position):
     c.node.setScale(2, 2.5, 2)
 
     ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-    c.body = ei.createSingleDynamicBox(5.5, app._world, app._space)
+    c.body = ei.createSingleDynamicBox(1.5, app._world, app._space)
     c.body.setDamping(2,2)
     c.body.sleep() # put the crates to sleep until we need them
     c.geom = c.body.getGeometry(0)
@@ -272,6 +280,7 @@ def makeEndRoom(app, offset, i):
 def makePlatform(app, name, offset, material='platform0-'):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
+    name = name + str(offset)
     
     c = Platform(name = name, materialName = material)
     containers[c.id] = c
@@ -297,6 +306,7 @@ def makePlatform(app, name, offset, material='platform0-'):
 def makeTiltingPlatform(app, name, offset, material='platform0-'):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
+    name = name + str(offset)
     
     c = Platform(name = name, materialName = material)
     containers[c.id] = c
@@ -441,9 +451,10 @@ def makeUnlockKey(app, offset):
     return c
 
 
-def makeIcePlatform(app, name, offset, material = None):
+def makeIcePlatform(app, name, offset, angle=0, material = None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
+    name = name + str(offset)
     
     c = Platform(name = name, materialName = material)
     containers[c.id] = c
@@ -451,6 +462,8 @@ def makeIcePlatform(app, name, offset, material = None):
     c.node = root.createChildSceneNode(name)
     c.node.setPosition(offset)
     c.node.attachObject(c.ent)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
 
     c.ent.setCastShadows(True)
 
@@ -469,9 +482,10 @@ def makeIcePlatform(app, name, offset, material = None):
     return c
 
     
-def makeCornerRamp(app, name, offset, material = 'platform0-'):
+def makeCornerRamp(app, name, offset, angle=0, material = 'platform0-'):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
+    name = name + str(offset)
     
     c = Platform(name = name, materialName = material)
     containers[c.id] = c
@@ -479,6 +493,8 @@ def makeCornerRamp(app, name, offset, material = 'platform0-'):
     c.node = root.createChildSceneNode(name)
     c.node.setPosition(offset)
     c.node.attachObject(c.ent)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
 
     c.ent.setCastShadows(True)
 
@@ -495,9 +511,10 @@ def makeCornerRamp(app, name, offset, material = 'platform0-'):
     return c
 
     
-def makeStraightRamp(app, name, offset, material = 'platform0-'):
+def makeStraightRamp(app, name, offset, angle=0, material = 'platform0-'):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
+    name = name + str(offset)
     
     c = Platform(name = name, materialName = material)
     containers[c.id] = c
@@ -505,7 +522,8 @@ def makeStraightRamp(app, name, offset, material = 'platform0-'):
     c.node = root.createChildSceneNode(name)
     c.node.setPosition(offset)
     c.node.attachObject(c.ent)
-
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
     c.ent.setCastShadows(True)
 
     ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
@@ -521,9 +539,11 @@ def makeStraightRamp(app, name, offset, material = 'platform0-'):
     return c
 
     
-def makeUpDownRamp(app, name, offset, material = 'platform0-'):
+def makeUpDownRamp(app, name, offset, angle=0, material = 'platform0-'):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
+    
+    name = name + str(offset)
     
     c = Platform(name = name, materialName = material)
     containers[c.id] = c
@@ -531,6 +551,8 @@ def makeUpDownRamp(app, name, offset, material = 'platform0-'):
     c.node = root.createChildSceneNode(name)
     c.node.setPosition(offset)
     c.node.attachObject(c.ent)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
 
     c.ent.setCastShadows(True)
 
@@ -547,16 +569,18 @@ def makeUpDownRamp(app, name, offset, material = 'platform0-'):
     return c
 
     
-def makeOnOffRamp(app, name, offset, material = 'platform0-'):
+def makeOnOffRamp(app, name, offset, angle=0, material = 'platform0-'):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
-    
+    name = name + str(offset)
     c = Platform(name = name, materialName = material)
     containers[c.id] = c
     c.ent = scn.createEntity(name, 'OnOffRamp.mesh')
     c.node = root.createChildSceneNode(name)
     c.node.setPosition(offset)
     c.node.attachObject(c.ent)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
 
     c.ent.setCastShadows(True)
 
@@ -572,9 +596,10 @@ def makeOnOffRamp(app, name, offset, material = 'platform0-'):
 
     return c
     
-def makeDomino(app, name, offset, angle, material = 'Domino-'):
+def makeDomino(app, name, offset, angle=0, material = 'Domino-'):
         scn = app.sceneManager
         rootNode = scn.getRootSceneNode()
+        name = name + str(offset)
         
         c = Domino(name,angle, materialName = material)
         #self.dominoes.append(c.id)
