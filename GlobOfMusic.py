@@ -201,7 +201,7 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
             key = self.musicManager.finishKeys.pop(0)
             if key in containers:
                 c = containers[key]
-                if isinstance(c, Platform):
+                if isinstance(c, Fireable):
                     c.done()
                     
         self.level.animate(frameEvent)
