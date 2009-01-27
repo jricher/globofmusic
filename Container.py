@@ -296,15 +296,15 @@ class Platform(Fireable):
         Fireable.__del__(self)
 
 class Key(Fireable):
-    def __init__(self, name = None, materialName = 'keys-'):
-        Fireable.__init__(self, name, materialName)
+    def __init__(self, name = None):
+        Fireable.__init__(self, name)
     def __del__(self):
         if not Fireable:
             return
         Fireable.__del__(self)
 
     def setMaterial(self):
-        if self.ent and self.materialName and self.state != 'waiting':
+        if self.ent:
             n = self.ent.getNumSubEntities()
             for i in range(n):
                 sub = self.ent.getSubEntity(i)
