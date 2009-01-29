@@ -751,15 +751,33 @@ def makeRupee(app, name, offset):
     
     c.body.setPosition(offset)
      
-    velocity = ogre.Vector3(random.random(), random.random(), random.random())
-    velocity.normalise()
-    c.body.setAngularVelocity(velocity)
+    #velocity = ogre.Vector3(random.random(), random.random(), random.random())
+    #velocity.normalise()
+    #c.body.setAngularVelocity(velocity)
 
     c.joint = OgreOde.BallJoint(app._world)
     c.joint.attach(c.body)
     c.joint.setAnchor(offset)
 
-    c.friction = 2
+    c.motor = OgreOde.AngularMotorJoint(app._world)
+    c.motor.setAnchor(offset)
+    c.motor.attach(c.body)
+    c.motor.setAxisCount(3)
+    c.motor.setAxis(0, OgreOde.AngularMotorJoint.RelativeOrientation_GlobalFrame, ogre.Vector3().UNIT_Y)
+    c.motor.setAxis(1, OgreOde.AngularMotorJoint.RelativeOrientation_GlobalFrame, ogre.Vector3().UNIT_X)
+    c.motor.setAxis(2, OgreOde.AngularMotorJoint.RelativeOrientation_GlobalFrame, ogre.Vector3().UNIT_Z)
+
+    c.motor.setMode(OgreOde.AngularMotorJoint.Mode_UserAngularMotor)
+    c.motor.setAngle(0, 0)
+    c.motor.setAngle(1, 0)
+    c.motor.setAngle(2, 0)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MaximumForce, 5, 1)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MotorVelocity, 0, 1)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MaximumForce, 5, 2)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MotorVelocity, 0, 2)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MaximumForce, 5, 3)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MotorVelocity, 0, 3)
+    
 
     c.geom.setUserData(c.id)
 

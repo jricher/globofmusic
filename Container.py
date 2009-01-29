@@ -24,6 +24,7 @@ class Container(object):
         self.node = None # OGRE scene node
         self.ent = None  # OGRE entity
         self.joint = None # ODE Joint
+        self.motor = None # ODE Motor
         self.sound = None  # OpenAL sound
         self.sounds = [] # List of OpenAL sounds
         self.quant = None # MusicManager quantization
@@ -51,6 +52,9 @@ class Container(object):
         if self.joint:
             self.joint.detach()
             del self.joint
+        if self.motor:
+            self.motor.detach()
+            del self.motor
         if self.geom:
             self.geom.disable()
             del self.geom

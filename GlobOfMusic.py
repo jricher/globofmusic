@@ -369,9 +369,6 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         
     def addForcesAndTorques(self, time):
         
-        for c in containers.values():
-            if isinstance(c, Rupee):
-                c.body.setAngularVelocity(c.body.getAngularVelocity()*0.995)
         # the player should always be awake, i think...
         self.player.body.wake()
             
