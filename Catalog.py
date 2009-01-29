@@ -231,6 +231,10 @@ def makeStartRoom(app, offset, i):
 #    rightDoor.lock(app._world)
     key.doors.append(leftDoor)
     key.doors.append(rightDoor)
+    
+    makeRupee(app, "Rupee", offset + ogre.Vector3(0,5,-5))
+    
+    
 
     return Arena(floor, walls, i)
     
@@ -627,4 +631,50 @@ def makeDomino(app, name, offset, angle=0, material = 'Domino-'):
         c.setMaterial()
         
         return c
+    
+    
+    
+def makeRupee(app, name, offset):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    name = name + str(offset)
+    
+    c = Rupee(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'rupee.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
+    c.node.attachObject(c.body)
+    mass = OgreOde.BoxMass (5.5, ei.getSize())
+    mass.setDensity(0.10, ei.getSize())
+    c.body.setMass(mass)
+    
+    c.geom.setBody(c.body)
+    c.ent.setUserObject(c.geom)
+    
+    c.body.setPosition(offset)
+     
+    velocity = ogre.Vector3(random.random(), random.random(), random.random())
+    velocity.normalise()
+    c.body.setAngularVelocity(velocity)
+
+    c.joint = OgreOde.BallJoint(app._world)
+    c.joint.attach(c.body)
+    c.joint.setAnchor(offset)
+
+    c.friction = 2
+
+    c.geom.setUserData(c.id)
+
+    return c
+    
+    
+
     

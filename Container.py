@@ -516,4 +516,21 @@ class BaseLevel(object):
         del self.startLevelCallback
         del self.wide
 
-# creation functions
+class Rupee(Powerup):
+    def __init__(self, powerupName, name = None):
+        Container.__init__(self, name)
+
+        self.powerupName = powerupName
+        self.overlay = None
+        
+    def __del__(self):
+        if self.powerupName:
+            del self.powerupName
+        if self.overlay:
+            del self.overlay
+        if not Container:
+            return
+        Container.__del__(self)
+        
+    def collide(self, other, contact, normal, lm):
+        return Container.collide(self, other, contact, normal, lm)
