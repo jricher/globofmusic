@@ -1,6 +1,6 @@
 <mesh>
 	<submeshes>
-		<submesh material="InnerSphere" usesharedvertices="false">
+		<submesh material="InnerSphere-waiting" usesharedvertices="false">
 			<faces count="20">
 				<face v1="0" v2="1" v3="2"/>
 				<face v1="3" v2="4" v3="5"/>
@@ -268,7 +268,7 @@
 				</vertexbuffer>
 			</geometry>
 		</submesh>
-		<submesh material="MiddleRing" usesharedvertices="false">
+		<submesh material="MiddleRing-waiting" usesharedvertices="false">
 			<faces count="256">
 				<face v1="0" v2="1" v3="2"/>
 				<face v1="0" v2="2" v3="3"/>
@@ -2580,7 +2580,7 @@
 				</vertexbuffer>
 			</geometry>
 		</submesh>
-		<submesh material="OuterRing" usesharedvertices="false">
+		<submesh material="OuterRing-waiting" usesharedvertices="false">
 			<faces count="256">
 				<face v1="0" v2="1" v3="3"/>
 				<face v1="1" v2="2" v3="3"/>
@@ -4892,7 +4892,7 @@
 				</vertexbuffer>
 			</geometry>
 		</submesh>
-		<submesh material="InnerRing" usesharedvertices="false">
+		<submesh material="InnerRing-waiting" usesharedvertices="false">
 			<faces count="256">
 				<face v1="0" v2="1" v3="3"/>
 				<face v1="1" v2="2" v3="3"/>

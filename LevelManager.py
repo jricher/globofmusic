@@ -140,10 +140,21 @@ class LevelManager(OgreOde.CollisionListener, object):
         self.mm.setTempo(self.tempo)
         
         # grab our background tracks
+##        app.music['bg-1'] = sm.createSound('bg-1', 'zile.wav', True)
+##        app.music['bg-2'] = sm.createSound('bg-2', 'pyke.wav', True)
+##        app.music['bg-3'] = sm.createSound('bg-3', 'stye.wav', True)
+##        app.music['bg-4'] = sm.createSound('bg-4', 'zile.wav', True)
+##        app.music['bg-5'] = sm.createSound('bg-5', 'pyke.wav', True)
+##        app.music['bg-6'] = sm.createSound('bg-6', 'stye.wav', True)
+##
+
+
         app.music['bg-1'] = sm.createSound('bg-1', 'level-0-1.wav', True)
         app.music['bg-2'] = sm.createSound('bg-2', 'level-0-2.wav', True)
         app.music['bg-3'] = sm.createSound('bg-3', 'level-0-3.wav', True)
         app.music['bg-4'] = sm.createSound('bg-4', 'level-0-4.wav', True)
+        app.music['bg-5'] = sm.createSound('bg-5', 'level-0-5.wav', True)
+        app.music['bg-6'] = sm.createSound('bg-6', 'level-0-6.wav', True)
 
         self.defaultBackgroundMusic = app.music['bg-1']
 
@@ -153,17 +164,61 @@ class LevelManager(OgreOde.CollisionListener, object):
             #m.setGain(0.25)
 
         # grab all of our sound effects
-        files = ['bell-hi-0', 'bell-hi-1', 'bell-lo-0', 'bell-lo-1',
-                 'bowen-0', 'bowen-1', 'bowen-2', 'bowen-3',
-                 'key-0', 'key-1', 'key-2', 'key-3',
-                 'neutron-0', 'neutron-1',
-                 'tabla-0', 'tabla-1', 'tabla-2', 'tabla-3', 'tabla-4', 'tabla-5',
-                 'wurl-0', 'wurl-1', 'wurl-2', 'wurl-3',
-                 'runup']
+##        files = {'key-0' : 'zinn.wav',
+##                 'key-1' : 'tax2.wav',
+##                 'key-2' : 'rocket.wav',
+##                 'key-3' : 'imperial.wav',
+##                 'tone-0' : 'good2.wav',
+##                 'tone-1' : 'good3.wav',
+##                 'tone-2' : 'advert.wav',
+##                 'tone-3' : 'asian.wav',
+##                 'tone-4' : 'asian2.wav',
+##                 'tone-5' : 'bad.wav',
+##                 'tone-6' : 'baddeal.wav',
+##                 'tone-7' : 'bank2.wav',
+##                 'perc-0' : 'bank.wav',
+##                 'perc-1' : 'crew.wav',
+##                 'perc-2' : 'engine.wav',
+##                 'perc-3' : 'fuel.wav',
+##                 'perc-4' : 'help.wav',
+##                 'perc-5' : 'insure.wav',
+##                 'bell-0' : 'lavamind.wav',
+##                 'bell-1' : 'loan.wav',
+##                 'bell-2' : 'loro.wav',
+##                 'bell-3' : 'mech.wav',
+##                 'bell-4' : 'zinn.wav',
+##                 'bell-5' : 'tax.wav'
+##                 }
+        # grab all of our sound effects
+        files = {'key-0' : 'key-0.wav',
+                 'key-1' : 'key-1.wav',
+                 'key-2' : 'key-2.wav',
+                 'key-3' : 'key-3.wav',
+                 'tone-0' : 'wurl-0.wav',
+                 'tone-1' : 'wurl-1.wav',
+                 'tone-2' : 'wurl-2.wav',
+                 'tone-3' : 'wurl-3.wav',
+                 'tone-4' : 'bowen-0.wav',
+                 'tone-5' : 'bowen-1.wav',
+                 'tone-6' : 'bowen-2.wav',
+                 'tone-7' : 'bowen-3.wav',
+                 'perc-0' : 'tabla-0.wav',
+                 'perc-1' : 'tabla-1.wav',
+                 'perc-2' : 'tabla-2.wav',
+                 'perc-3' : 'tabla-3.wav',
+                 'perc-4' : 'tabla-4.wav',
+                 'perc-5' : 'tabla-5.wav',
+                 'bell-0' : 'bell-hi-0.wav',
+                 'bell-1' : 'bell-hi-1.wav',
+                 'bell-2' : 'bell-lo-0.wav',
+                 'bell-3' : 'bell-lo-1.wav',
+                 'bell-4' : 'neutron-0.wav',
+                 'bell-5' : 'neutron-1.wav'
+                 }
 
-        for f in files:
-            print 'Loading sound %s' % (f + '.wav')
-            app.sounds[f] = sm.createSound(f, f + '.wav', False)        
+        for f in sorted(files):
+            print 'Loading sound %s from file %s' % (f, files[f])
+            app.sounds[f] = sm.createSound(f, files[f], False)        
 
             
         # set all sounds relative to the listener

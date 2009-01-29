@@ -9,7 +9,7 @@ from Catalog import *
 class Level(BaseLevel):
     def __init__(self, levelId):
         BaseLevel.__init__(self, levelId)
-        self.wide = True
+        #self.wide = True
 ##
 ##
 ##    def __del__(self):
@@ -19,10 +19,10 @@ class Level(BaseLevel):
     def load(self, app):
         print 'Loaded Level Bob'
 
-        self.backgroundMusic = app.music['bg-3']
+        self.backgroundMusic = app.music['bg-5']
 
         crate = makeCrate(app, 'Bob Crate', self.offset + ogre.Vector3(0, 2, 0))
-        crate.sound = app.sounds['bell-lo-0']
+        crate.sound = app.sounds['bell-5']
 
         #platform = makeIcePlatform(app, 'Bob Platform', self.offset + ogre.Vector3(10, 1, 0))
         #platform.sound = app.sounds['key-1']

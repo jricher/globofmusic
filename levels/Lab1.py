@@ -21,7 +21,7 @@ class Level(BaseLevel):
         self.backgroundMusic = app.music['bg-3']
 
         crate = makeCrate(app, 'Lab1 Crate', self.offset + ogre.Vector3(0, 2, 0))
-        crate.sound = app.sounds['bell-lo-0']
+        crate.sound = app.sounds['bell-0']
 
 
     def unload(self, app):

@@ -1,16 +1,59 @@
-material IceChunk
+material IceChunk-waiting
 {
 	receive_shadows on
 	technique
 	{
 		pass
 		{
-			ambient 0.500000 0.500000 0.500000 0.919469
-			diffuse 0.727999 0.800000 0.800000 0.919469
-			specular 0.500000 0.500000 0.500000 0.919469 12.500000
-			emissive 0.000000 0.000000 0.000000 0.919469
-			scene_blend alpha_blend
-			depth_write off
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.071840 0.000000 0.800000 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+
+material IceChunk-armed
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.071840 0.000000 0.800000 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+
+material IceChunk-fired
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.071840 0.000000 0.800000 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+
+material IceChunk-done
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.071840 0.000000 0.800000 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
 		}
 	}
 }

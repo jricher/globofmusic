@@ -90,12 +90,14 @@ def makeBlockingWall(app, offset, i):
     
     return c
 
-def makeCrate(app, name, position, angle=0):
+def makeCrate(app, name, offset, angle=0):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
-    name = name + str(position)
+    name = name + str(offset)
+
+    offset = offset + ogre.Vector3(0, 1.25, 0)
     
-    c = Fireable(name)
+    c = Container(name)
     containers[c.id] = c
     c.ent = scn.createEntity(name, "Cube.mesh")
     #c.ent.setNormaliseNormals(True)
@@ -109,7 +111,7 @@ def makeCrate(app, name, position, angle=0):
     c.node.attachObject(c.ent)
     
 
-    c.node.setPosition(position)
+    c.node.setPosition(offset)
     quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
     c.node.setOrientation(quat)
     c.node.setScale(2, 2.5, 2)
@@ -124,10 +126,10 @@ def makeCrate(app, name, position, angle=0):
     
     return c
 
-def makeSleepyCrate(app, name, position):
+def makeMetalCrate(app, name, offset):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
-    name = name + str(position)
+    name = name + str(offset)
     
     c = Fireable(name)
     containers[c.id] = c
@@ -143,7 +145,7 @@ def makeSleepyCrate(app, name, position):
     c.node = root.createChildSceneNode(c.ent.getName())
     c.node.attachObject(c.ent)
 
-    c.node.setPosition(position)
+    c.node.setPosition(offset)
 
     c.node.setScale(2, 2.5, 2)
 
@@ -202,31 +204,29 @@ def makeStartRoom(app, offset, i):
     #Starting Room platform
     key = MultiPartLock()
 
-    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, -10))
-    c.sound = app.sounds['key-0']
+    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, -10), sound='key-0')
     c.quant = 8
     c.key = key
     key.sources.append(c)
 
-    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, 10))
-    c.sound = app.sounds['key-1']
+    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, 10), sound='key-1')
     c.quant = 8
     c.key = key
     key.sources.append(c)
 
-    c = makeUnlockKey(app, offset + ogre.Vector3(10, 2, 0))
-    c.sound = app.sounds['key-2']
+    c = makeUnlockKey(app, offset + ogre.Vector3(10, 2, 0), sound='key-2')
     c.quant = 8
     c.key = key
     key.sources.append(c)
 
-    c = makeUnlockKey(app, offset + ogre.Vector3(-10, 2, 0))
-    c.sound = app.sounds['key-3']
+    #makeBarbell(app, "A Domino", offset + ogre.Vector3(-10,10,0), 0)
+
+    c = makeUnlockKey(app, offset + ogre.Vector3(-10, 2, 0), sound='key-3')
     c.quant = 8
     c.key = key
     key.sources.append(c)
 
-    (leftDoor, rightDoor) = makeSwingingDoors(app, offset)
+    (leftDoor, rightDoor) = makeSwingingDoors(app, offset + ogre.Vector3(0, 0, 24.5))
 #    leftDoor.lock(app._world)
 #    rightDoor.lock(app._world)
     key.doors.append(leftDoor)
@@ -281,7 +281,7 @@ def makeEndRoom(app, offset, i):
     return Arena(floor, walls, i)
     
 
-def makePlatform(app, name, offset, material='platform0-'):
+def makePlatform(app, name, offset, material='platform0-', sound=None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     name = name + str(offset)
@@ -303,11 +303,14 @@ def makePlatform(app, name, offset, material='platform0-'):
     # set the initial material
     c.setMaterial()
 
+    if sound:
+        c.sound = app.sounds[sound]
+
     c.geom.setUserData(c.id)
 
     return c
 
-def makeTiltingPlatform(app, name, offset, material='platform0-'):
+def makeTiltingPlatform(app, name, offset, material='platform0-', sound=None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     name = name + str(offset)
@@ -338,6 +341,9 @@ def makeTiltingPlatform(app, name, offset, material='platform0-'):
     c.joint.attach(c.body)
     c.joint.setAnchor(offset)
 
+    if sound:
+        c.sound = app.sounds[sound]
+
     # set the initial material
     c.setMaterial()
 
@@ -361,7 +367,7 @@ def makeSwingingDoors(app, offset):
     c.node = root.createChildSceneNode(c.ent.getName())
 
     c.node.attachObject(c.ent)
-    c.node.setPosition(ogre.Vector3(4,2.5,24.5) + offset)
+    c.node.setPosition(ogre.Vector3(4,2.5,0) + offset)
     c.node.setScale(4,1,2)
 
     ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
@@ -372,7 +378,7 @@ def makeSwingingDoors(app, offset):
     c.joint = OgreOde.HingeJoint(app._world)
     c.joint.attach(c.body)
     c.joint.setAxis(ogre.Vector3().UNIT_Y)
-    c.joint.setAnchor(ogre.Vector3(7.5,2.5,24.5) + offset)
+    c.joint.setAnchor(ogre.Vector3(7.5,2.5,0) + offset)
     
     c.geom.setUserData(c.id)
 
@@ -390,7 +396,7 @@ def makeSwingingDoors(app, offset):
     c.node = root.createChildSceneNode(c.ent.getName())
 
     c.node.attachObject(c.ent)
-    c.node.setPosition(ogre.Vector3(-4.1,2.5,24.5) + offset)
+    c.node.setPosition(ogre.Vector3(-4.1,2.5,0) + offset)
     c.node.setScale(4,1,2)
     ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
     c.body = ei.createSingleDynamicBox(20.0, app._world, app._space)
@@ -400,7 +406,7 @@ def makeSwingingDoors(app, offset):
     c.joint = OgreOde.HingeJoint(app._world)
     c.joint.attach(c.body)
     c.joint.setAxis(ogre.Vector3().UNIT_Y)
-    c.joint.setAnchor(ogre.Vector3(-7.6,2.5,24.5) + offset)
+    c.joint.setAnchor(ogre.Vector3(-7.6,2.5,0) + offset)
     
     c.geom.setUserData(c.id)
     
@@ -410,7 +416,7 @@ def makeSwingingDoors(app, offset):
     return doors
 
 
-def makeUnlockKey(app, offset):
+def makeUnlockKey(app, offset, sound='key-0'):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     
@@ -447,6 +453,9 @@ def makeUnlockKey(app, offset):
     c.joint.attach(c.body)
     c.joint.setAnchor(offset)
 
+    if sound:
+        c.sound = app.sounds[sound]
+
     # set the initial material
     c.setMaterial()
 
@@ -455,7 +464,7 @@ def makeUnlockKey(app, offset):
     return c
 
 
-def makeIcePlatform(app, name, offset, angle=0, material = None):
+def makeIcePlatform(app, name, offset, angle=0, material = None, sound=None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     name = name + str(offset)
@@ -476,6 +485,9 @@ def makeIcePlatform(app, name, offset, angle=0, material = None):
 
     c.ent.setUserObject(c.geom)
     
+    if sound:
+        c.sound = app.sounds[sound]
+
     # set the initial material
     c.setMaterial()
 
@@ -486,7 +498,7 @@ def makeIcePlatform(app, name, offset, angle=0, material = None):
     return c
 
     
-def makeCornerRamp(app, name, offset, angle=0, material = 'platform0-'):
+def makeCornerRamp(app, name, offset, angle=0, material = 'platform0-', sound=None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     name = name + str(offset)
@@ -507,6 +519,9 @@ def makeCornerRamp(app, name, offset, angle=0, material = 'platform0-'):
 
     c.ent.setUserObject(c.geom)
     
+    if sound:
+        c.sound = app.sounds[sound]
+
     # set the initial material
     c.setMaterial()
 
@@ -515,7 +530,7 @@ def makeCornerRamp(app, name, offset, angle=0, material = 'platform0-'):
     return c
 
     
-def makeStraightRamp(app, name, offset, angle=0, material = 'platform0-'):
+def makeStraightRamp(app, name, offset, angle=0, material = 'platform0-', sound=None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     name = name + str(offset)
@@ -535,6 +550,9 @@ def makeStraightRamp(app, name, offset, angle=0, material = 'platform0-'):
 
     c.ent.setUserObject(c.geom)
     
+    if sound:
+        c.sound = app.sounds[sound]
+
     # set the initial material
     c.setMaterial()
 
@@ -543,7 +561,7 @@ def makeStraightRamp(app, name, offset, angle=0, material = 'platform0-'):
     return c
 
     
-def makeUpDownRamp(app, name, offset, angle=0, material = 'platform0-'):
+def makeUpDownRamp(app, name, offset, angle=0, material = 'platform0-', sound=None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     
@@ -565,6 +583,9 @@ def makeUpDownRamp(app, name, offset, angle=0, material = 'platform0-'):
 
     c.ent.setUserObject(c.geom)
     
+    if sound:
+        c.sound = app.sounds[sound]
+
     # set the initial material
     c.setMaterial()
 
@@ -573,7 +594,7 @@ def makeUpDownRamp(app, name, offset, angle=0, material = 'platform0-'):
     return c
 
     
-def makeOnOffRamp(app, name, offset, angle=0, material = 'platform0-'):
+def makeOnOffRamp(app, name, offset, angle=0, material = 'platform0-', sound=None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     name = name + str(offset)
@@ -593,6 +614,9 @@ def makeOnOffRamp(app, name, offset, angle=0, material = 'platform0-'):
 
     c.ent.setUserObject(c.geom)
     
+    if sound:
+        c.sound = app.sounds[sound]
+
     # set the initial material
     c.setMaterial()
 
@@ -600,39 +624,105 @@ def makeOnOffRamp(app, name, offset, angle=0, material = 'platform0-'):
 
     return c
     
-def makeDomino(app, name, offset, angle=0, material = 'Domino-'):
-        scn = app.sceneManager
-        rootNode = scn.getRootSceneNode()
-        name = name + str(offset)
-        
-        c = Domino(name,angle, materialName = material)
-        #self.dominoes.append(c.id)
-        containers[c.id] = c
-        c.ent = scn.createEntity(name, "Domino.mesh")
-        c.ent.setCastShadows(True)
-        c.node = rootNode.createChildSceneNode(c.ent.getName())
-        c.node.attachObject(c.ent)
-        c.startPosition = offset
-        c.node.setPosition(offset)
-        quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
-        c.node.setOrientation(quat)
-        ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-        c.body = ei.createSingleDynamicBox(5.0,app._world, app._space)
-        c.body.setDamping(2,2)
-        c.geom = c.body.getGeometry(0)
-        c.joint = OgreOde.HingeJoint(app._world)
-        c.joint.attach(c.body)
-        c.joint.setAxis(quat.xAxis())
-        
-        c.joint.setAnchor(offset - ogre.Vector3(0,2,0)) # The joint needs to be below the domino, instead of in the middle
-        
-        c.geom.setUserData(c.id)
+def makeDomino(app, name, offset, angle=0, material = 'Domino-', sound=None):
+    scn = app.sceneManager
+    rootNode = scn.getRootSceneNode()
+    name = name + str(offset)
 
-        c.setMaterial()
-        
-        return c
+    # make dominoes float properly
+    offset = offset + ogre.Vector3(0, 2.1, 0)
+
+    c = Domino(name,angle, materialName = material)
+    #self.dominoes.append(c.id)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, "Domino.mesh")
+    c.ent.setCastShadows(True)
+    c.node = rootNode.createChildSceneNode(c.ent.getName())
+    c.node.attachObject(c.ent)
+    c.startPosition = offset
+    c.node.setPosition(offset)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
+    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    c.body = ei.createSingleDynamicBox(5.0,app._world, app._space)
+    c.body.setDamping(2,2)
+    c.geom = c.body.getGeometry(0)
+    c.joint = OgreOde.HingeJoint(app._world)
+    c.joint.attach(c.body)
+    c.joint.setAxis(quat.xAxis())
+
+    c.joint.setAnchor(offset + ogre.Vector3(0, -2, 0)) # The joint needs to be below the domino, instead of in the middle
+
+    if sound:
+        c.sound = app.sounds[sound]
+
+    c.geom.setUserData(c.id)
+
+    c.setMaterial()
+
+    return c
+
+def makeBall(app, name, offset):
+
+    scn = app.sceneManager
+    rootNode = scn.getRootSceneNode()
+    name = name + str(offset)
     
+    c = Container(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, "Ball.mesh")
+    c.ent.setCastShadows(True)
+    c.node = rootNode.createChildSceneNode(c.ent.getName())
+    c.node.attachObject(c.ent)
+    c.node.setPosition(offset)
+
+    ei = OgreOde.EntityInformer(c.ent, ogre.Matrix4.getScale(c.node.getScale()))
+    c.body = ei.createSingleDynamicSphere(10.0, app._world, app._space)
+
+    c.geom = c.body.getGeometry(0)
+
+    c.geom.setUserData(c.id)
+
+    return c
+
+
+def makeBarbell(app, name, offset, angle=0):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
     
+    name = name + str(offset)
+
+    offset = offset + ogre.Vector3(0, 1, 0)
+
+    c = Barbell(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'Barbell.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
+    c.node.attachObject(c.body)
+    mass = OgreOde.BoxMass (5.0, ei.getSize()) ## TODO: make it the sphere mass
+    mass.setDensity(5.0, ei.getSize())
+    c.body.setMass(mass)
+
+    c.geom.setBody(c.body)
+    c.ent.setUserObject(c.geom)
+
+    c.body.setPosition(offset)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.body.setOrientation(quat)
+    
+    c.body.wake()
+
+    c.geom.setUserData(c.id)
+
+    return c
     
 def makeRupee(app, name, offset):
     scn = app.sceneManager
@@ -674,7 +764,3 @@ def makeRupee(app, name, offset):
     c.geom.setUserData(c.id)
 
     return c
-    
-    
-
-    

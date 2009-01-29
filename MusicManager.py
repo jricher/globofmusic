@@ -14,13 +14,14 @@
 
 class MusicManager():
     def __init__(self, tempo = 90):
-        self.queue = []    # queue of sounds to play, in order; contains None for rests
-        self.loop = []     # list of sounds to play during a loop
-        self.stops = []    # list of sounds to be stopped
-        self.fading = []   # list of sounds that are currently fading out
-        self.fireKeys = [] # list of ids for sounds that got fired from the queue (to be read and cleared externally)
-        self.playing  = [] # list of ids for sounds that are currently playing, fired from the queue 
-        self.finishKeys = [] #list of ids for sounds that ended after being fired from the queue (Also to be read and cleared externally)
+        self.queue = []       # queue of sounds to play, in order; contains None for rests
+        self.loop = []        # list of sounds to play during a loop
+        self.stops = []       # list of sounds to be stopped
+        self.fading = []      # list of sounds that are currently fading out
+        self.fireKeys = []    # list of ids for sounds that got fired from the queue (to be read and cleared externally)
+        self.playing  = []    # list of ids for sounds that are currently playing, fired from the queue 
+        self.finishKeys = []  # list of ids for sounds that ended after being fired from the queue (Also to be read and cleared externally)
+        self.silentCount = {} # dictionary of id->count for sounds that should not be re-queued
         self.setTempo(tempo)
 
     def __del__(self):
@@ -29,6 +30,7 @@ class MusicManager():
         del self.stops
         del self.fading
         del self.fireKeys
+        del self.silentCount[:]
 
     def setTempo(self, tempo,
                  bars = 4,            # number of consecutive bars (for loop processing)
@@ -147,6 +149,18 @@ class MusicManager():
                 #else:
                     #print 'queue', 'rest'
 
+            if self.silentCount:
+                unsilence = []
+                for id in self.silentCount:
+                    self.silentCount[id] -= 1
+                    if self.silentCount[id] <= 0:
+                        unsilence.append(id)
+                for u in unsilence:
+                    del self.silentCount[u]
+                #print self.silentCount
+                    
+                    
+
         
     def addLoopedSound(self, sound, beat):
         '''
@@ -190,7 +204,7 @@ class MusicManager():
         if sound in self.loop[beat]:
             self.loop[beat].remove(sound)
 
-    def addQueuedSound(self, sound, quantize=None, space=None, id=None):
+    def addQueuedSound(self, sound, quantize=None, space=None, id=None, silence=False):
         '''
         Adds the given sound, optionally quantized to the given resolution
         and given 'space' number of beats before the next trigger is allowed.
@@ -199,6 +213,12 @@ class MusicManager():
         '''
         #print 'appending %s to queue' % sound.getFileName()
 
+        # add to the silent count if need be
+        if id and silence:
+            if id in self.silentCount:
+                return # shortcut out if needed
+            self.silentCount[id] = self.totalBeats / 2
+            
         #if not self.queue and quantize == self.totalBeats:
             # we don't have anything queued, and we're asked to quantize on the start beat
             # might as well start-a-fresh!
@@ -245,6 +265,9 @@ class MusicManager():
 
     def isFireKeyQueued(self, key):
         return key in (q[1] for q in self.queue if type(q) is tuple)                
+
+    def isSilent(self, id):
+        return id in self.silentCount
 
     def clearQueue(self):
         '''

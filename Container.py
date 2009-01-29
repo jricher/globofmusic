@@ -110,8 +110,8 @@ class Container(object):
             contact.setBouncyness(self.bouncy)
 
         # make a noise if the player hits it
-        if self.sound and isinstance(other, Player) and not lm.mm.isSoundQueued(self.sound):
-            lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
+        if self.sound and isinstance(other, Player) and not lm.mm.isSilent(self.id):
+            lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id, True)
 
         return True
 
@@ -278,13 +278,13 @@ class Fireable(Container):
     def collide(self, other, contact, normal, lm):
         if isinstance(other, Player) and self.arm():
             if self.sound and not lm.mm.isFireKeyQueued(self.id):
-                lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
+                lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id, True)
         return Container.collide(self, other, contact, normal, lm)
         
     def collideWith(self, other, contact, normal, lm):
         if isinstance(other, Player) and self.arm():
             if self.sound and not lm.mm.isFireKeyQueued(self.id):
-                lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id)
+                lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id, True)
         return False
         
 class Platform(Fireable):
@@ -308,7 +308,7 @@ class Key(Fireable):
             n = self.ent.getNumSubEntities()
             for i in range(n):
                 sub = self.ent.getSubEntity(i)
-                sub.materialName = self.materialName + self.state
+                sub.materialName = sub.materialName[:sub.materialName.find('-')] + '-' + self.state
 
                
 class MultiPartLock(object):
@@ -463,12 +463,13 @@ class Door(Container):
         del self.locks[:]
         self.locked = False
 
-class Domino(Platform):
+class Domino(Fireable):
     def __init__(self, name, angle=0.0, materialName = None):
         self.angle = angle
         self.startPosition = None
-        Platform.__init__(self, name, materialName, False)
+        Fireable.__init__(self, name, materialName, False)
         #newMaterial = "Domino%d-" % (int(name[-1]) % 6)
+        # random material
         newMaterial = "Domino%d-" % (self.id % 8)
         #print newMaterial 
         self.materialName = newMaterial
@@ -478,16 +479,63 @@ class Domino(Platform):
         #print "domino.__del__"
         del self.angle
         del self.startPosition 
-        if not Platform:
+        if not Fireable:
             return
-        Platform.__del__(self)
+        Fireable.__del__(self)
 
     def fire(self):
-        if Platform.fire(self):
+        if Fireable.fire(self):
             pass
             #if self.geom:
             #    self.geom.disable()
             
+    def collide(self, other, contact, normal, lm):
+        if isinstance(other, Domino):
+            contact.setCoulombFriction(100)
+            contact.setBouncyness(0.1)
+            return True
+        else:
+            return Fireable.collide(self, other, contact, normal, lm)
+
+    def collideWith(self, other, contact, normal, lm):
+        if isinstance(other, Domino):
+            contact.setCoulombFriction(100)
+            contact.setBouncyness(0.1)
+            return True
+        else:
+            return Fireable.collide(self, other, contact, normal, lm)
+    
+
+class Barbell(Container):
+    def __init__(self, name):
+        Container.__init__(self, name)
+        self.friction = 99999999
+
+    def __del__(self):
+        if not Container:
+            return
+        Container.__del__(self)
+
+    def collide(self, other, contact, normal, lm):
+        if isinstance(other, Player):
+            contact.setCoulombFriction(10)    ### OgreOde.Utility.Infinity)
+            contact.setBouncyness(0.1)
+
+            ## Yes, this collision is valid
+            return True
+        else:
+            return Container.collide(self, other, contact, normal, lm)
+        
+    def collideWith(self, other, contact, normal, lm):
+        if isinstance(other, Player):
+            # floors are pretty sticky
+            contact.setCoulombFriction(10)    ### OgreOde.Utility.Infinity)
+            contact.setBouncyness(0.1)
+    
+            ## Yes, we changed things
+            return True
+        else:
+            return False
     
 
 # lookup table for containers

@@ -1,4 +1,74 @@
-material MiddleRing
+material InnerSphere-armed
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.792714 0.800000 0.707665 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material InnerRing-fired
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.252699 0.015872 0.015872 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material OuterRing-fired
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.038527 0.041536 0.239637 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material InnerRing-done
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.252699 0.015872 0.015872 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material OuterRing-done
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.038527 0.041536 0.239637 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material MiddleRing-waiting
 {
 	receive_shadows on
 	technique
@@ -12,7 +82,7 @@ material MiddleRing
 		}
 	}
 }
-material InnerSphere
+material MiddleRing-armed
 {
 	receive_shadows on
 	technique
@@ -20,27 +90,55 @@ material InnerSphere
 		pass
 		{
 			ambient 0.500000 0.500000 0.500000 1.000000
-			diffuse 0.800000 0.800000 0.800000 1.000000
-			specular 0.500000 0.500000 0.500000 1.000000 12.500000
-			emissive 0.800000 0.800000 0.800000 1.000000
-		}
-	}
-}
-material OuterRing
-{
-	receive_shadows on
-	technique
-	{
-		pass
-		{
-			ambient 0.500000 0.500000 0.500000 1.000000
-			diffuse 0.027526 0.037150 0.670658 1.000000
+			diffuse 0.545298 0.779501 0.574295 1.000000
 			specular 0.500000 0.500000 0.500000 1.000000 12.500000
 			emissive 0.000000 0.000000 0.000000 1.000000
 		}
 	}
 }
-material InnerRing
+material MiddleRing-done
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.035918 0.239637 0.061141 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material MiddleRing-fired
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.035918 0.239637 0.061141 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material OuterRing-armed
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.628505 0.630504 0.762087 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material InnerRing-waiting
 {
 	receive_shadows on
 	technique
@@ -54,8 +152,7 @@ material InnerRing
 		}
 	}
 }
-
-material keys-armed
+material InnerSphere-done
 {
 	receive_shadows on
 	technique
@@ -63,13 +160,27 @@ material keys-armed
 		pass
 		{
 			ambient 0.500000 0.500000 0.500000 1.000000
-			diffuse 0.800000 0.800000 0.800000 1.000000
+			diffuse 0.296236 0.296236 0.296236 1.000000
 			specular 0.500000 0.500000 0.500000 1.000000 12.500000
-			emissive 0.800000 0.800000 0.800000 1.000000
+			emissive 0.000000 0.000000 0.000000 1.000000
 		}
 	}
 }
-material keys-fired
+material InnerRing-armed
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.766440 0.640438 0.640438 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material OuterRing-waiting
 {
 	receive_shadows on
 	technique
@@ -83,7 +194,7 @@ material keys-fired
 		}
 	}
 }
-material keys-done
+material InnerSphere-waiting
 {
 	receive_shadows on
 	technique
@@ -91,10 +202,23 @@ material keys-done
 		pass
 		{
 			ambient 0.500000 0.500000 0.500000 1.000000
-			diffuse 0.727257 0.010060 0.010060 1.000000
+			diffuse 0.800000 0.800000 0.800000 1.000000
 			specular 0.500000 0.500000 0.500000 1.000000 12.500000
 			emissive 0.000000 0.000000 0.000000 1.000000
 		}
 	}
 }
-
+material InnerSphere-fired
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.296236 0.296236 0.296236 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
