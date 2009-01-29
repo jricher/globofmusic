@@ -250,10 +250,8 @@ class LevelManager(OgreOde.CollisionListener, object):
             self.player.warpTo = (self.levels[level].playerStart)
         
         print 'Entering level %s (%d)' % (self.levels[level].name, level)
-        newCaption = self.levels[level].name
-        if newCaption != ogre.OverlayManager.getSingleton().getOverlayElement("CurrentLevel/Level").getCaption():
-            print "Setting caption"
-            ogre.OverlayManager.getSingleton().getOverlayElement("CurrentLevel/Level").setCaption(newCaption)
+        ogre.OverlayManager.getSingleton().getOverlayElement("CurrentLevel/Level").setCaption(self.levels[level].name)
+        ogre.OverlayManager.getSingleton().getByName("AreaClearOverlay").hide()
 
         # set the appropriate background music
         if self.currentLevel > 0 and self.levels[self.currentLevel].backgroundMusic:
@@ -586,6 +584,10 @@ class LevelManager(OgreOde.CollisionListener, object):
             c.node.attachObject(c.particleSystem)
         
             self.particles["Fireworks"] = c
+            
+            overlay = ogre.OverlayManager.getSingleton().getByName('CongratsOverlay')
+            overlay.show()
+            
     def smoke(self, level):
         if (not self.particles.has_key("Smoke")):
             scn = self.rootNode.getCreator()

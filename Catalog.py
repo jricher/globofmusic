@@ -228,9 +228,10 @@ def makeStartRoom(app, offset, i):
 
     (leftDoor, rightDoor) = makeSwingingDoors(app, offset + ogre.Vector3(0, 0, 24.5))
 #    leftDoor.lock(app._world)
-#    rightDoor.lock(app._world)
+    rightDoor.lock(app._world)
     key.doors.append(leftDoor)
     key.doors.append(rightDoor)
+    
     
     
     

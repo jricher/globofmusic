@@ -320,7 +320,10 @@ class MultiPartLock(object):
         self.name = name
         self.doors = []
         self.sources = []
-        self.unlockCallback = None
+        def showAreaClear():
+            overlay = ogre.OverlayManager.getSingleton().getByName('AreaClearOverlay')
+            overlay.show()
+        self.unlockCallback = showAreaClear
 
     def __del__(self):
         del self.name
@@ -466,6 +469,20 @@ class Door(Container):
         '''
         del self.locks[:]
         self.locked = False
+        
+    def collide(self, other, contact, normal, lm):
+        if self.locked and isinstance(other, Player):
+            self.overlay = ogre.OverlayManager.getSingleton().getByName('DoorLockedOverlay')
+            self.overlay.show()
+            self.overlayTimeout = 1
+        return True
+
+    def collideWith(self, other, contact, normal, lm):
+        if self.locked and isinstance(other, Player):
+            lm.overlay = ogre.OverlayManager.getSingleton().getByName('DoorLockedOverlay')
+            lm.overlay.show()
+            lm.overlayTimeout = 1
+        return False
 
 class Domino(Fireable):
     def __init__(self, name, angle=0.0, materialName = None):
