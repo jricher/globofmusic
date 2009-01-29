@@ -235,15 +235,16 @@ def makeStartRoom(app, offset, i):
     def areaClear():
         overlay = ogre.OverlayManager.getSingleton().getByName('AreaClearOverlay')
         overlay.show()  
-        c = Container("StartArrow")
-        c.particleSystem = scn.createParticleSystem('arrow', 'Examples/njrGreenyNimbus')
-        c.particleSystem.setKeepParticlesInLocalSpace(True)
+        if ("StartArrow" not in particles):
+            c = Container("StartArrow")
+            c.particleSystem = scn.createParticleSystem('arrow', 'Examples/njrGreenyNimbus')
+            c.particleSystem.setKeepParticlesInLocalSpace(True)
         
-        c.node = root.createChildSceneNode("StartArrow")
-        c.node.setPosition(offset + ogre.Vector3(0,0,-50))
+            c.node = root.createChildSceneNode("StartArrow")
+            c.node.setPosition(offset + ogre.Vector3(0,0,-50))
     
-        c.node.attachObject(c.particleSystem)
-        particles["StartArrow"] = c
+            c.node.attachObject(c.particleSystem)
+            particles["StartArrow"] = c
     
     key.unlockCallback = areaClear
     
@@ -795,3 +796,24 @@ def makeRupee(app, name, offset):
     c.geom.setUserData(c.id)
 
     return c
+
+def makeLevelLock(app, offset):
+    key = MultiPartLock()
+    def areaClear():
+        scn = app.sceneManager
+        root = scn.getRootSceneNode()
+        overlay = ogre.OverlayManager.getSingleton().getByName('AreaClearOverlay')
+        overlay.show()  
+        c = Container("StartArrow")
+        c.particleSystem = scn.createParticleSystem('arrow', 'Examples/njrGreenyNimbus')
+        c.particleSystem.setKeepParticlesInLocalSpace(True)
+        
+        c.node = root.createChildSceneNode("StartArrow")
+        c.node.setPosition(offset + ogre.Vector3(0,0,-50))
+    
+        c.node.attachObject(c.particleSystem)
+        particles["StartArrow"] = c
+        
+    key.unlockCallback = areaClear
+    
+    return key

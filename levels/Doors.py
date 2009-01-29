@@ -29,7 +29,7 @@ class Level(BaseLevel):
         platform.sound = app.sounds['tone-7']
         
         
-        key = MultiPartLock()
+        key = makeLevelLock(app, self.offset)
 
         c = makeUnlockKey(app, self.offset + ogre.Vector3(0, 2, 10), sound='key-1')
         c.quant = 8
@@ -41,23 +41,6 @@ class Level(BaseLevel):
         rightDoor.lock(app._world)
         key.doors.append(leftDoor)
         key.doors.append(rightDoor)
-        
-        def areaClear():
-            scn = app.sceneManager
-            root = scn.getRootSceneNode()
-            overlay = ogre.OverlayManager.getSingleton().getByName('AreaClearOverlay')
-            overlay.show()  
-            c = Container("StartArrow")
-            c.particleSystem = scn.createParticleSystem('arrow', 'Examples/njrGreenyNimbus')
-            c.particleSystem.setKeepParticlesInLocalSpace(True)
-            
-            c.node = root.createChildSceneNode("StartArrow")
-            c.node.setPosition(self.offset + ogre.Vector3(0,0,-50))
-        
-            c.node.attachObject(c.particleSystem)
-            particles["StartArrow"] = c
-    
-        key.unlockCallback = areaClear
 
 
     def unload(self, app):
