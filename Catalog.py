@@ -232,7 +232,7 @@ def makeStartRoom(app, offset, i):
     key.doors.append(leftDoor)
     key.doors.append(rightDoor)
     
-    makeRupee(app, "Rupee", offset + ogre.Vector3(0,5,-5))
+    
     
     
 
@@ -731,7 +731,7 @@ def makeRupee(app, name, offset):
     
     c = Rupee(name)
     containers[c.id] = c
-    c.ent = scn.createEntity(name, 'rupee.mesh')
+    c.ent = scn.createEntity(name, 'GemRupee.mesh')
     c.node = root.createChildSceneNode(name)
     c.node.attachObject(c.ent)
 
@@ -751,11 +751,12 @@ def makeRupee(app, name, offset):
     
     c.body.setPosition(offset)
      
-    #velocity = ogre.Vector3(random.random(), random.random(), random.random())
-    #velocity.normalise()
-    #c.body.setAngularVelocity(velocity)
+    velocity = ogre.Vector3(random.random(), random.random(), random.random())
+    velocity.normalise()
+    c.body.setAngularVelocity(velocity)
 
     c.joint = OgreOde.BallJoint(app._world)
+    
     c.joint.attach(c.body)
     c.joint.setAnchor(offset)
 

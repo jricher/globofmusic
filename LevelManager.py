@@ -250,6 +250,10 @@ class LevelManager(OgreOde.CollisionListener, object):
             self.player.warpTo = (self.levels[level].playerStart)
         
         print 'Entering level %s (%d)' % (self.levels[level].name, level)
+        newCaption = self.levels[level].name
+        if newCaption != ogre.OverlayManager.getSingleton().getOverlayElement("CurrentLevel/Level").getCaption():
+            print "Setting caption"
+            ogre.OverlayManager.getSingleton().getOverlayElement("CurrentLevel/Level").setCaption(newCaption)
 
         # set the appropriate background music
         if self.currentLevel > 0 and self.levels[self.currentLevel].backgroundMusic:
@@ -269,7 +273,7 @@ class LevelManager(OgreOde.CollisionListener, object):
                 self.levels[self.currentLevel].startLevelCallback(self.levels[self.currentLevel])
         
         # move the camera
-        if self.currentLevel != 0: # Don't animate the camera to start
+        if oldlevel != -1: # Don't animate the camera to start
             
             node = self.camera.getParentSceneNode()
 

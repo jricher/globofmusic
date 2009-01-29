@@ -111,17 +111,17 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         print 'FrameListener unloaded'
     
     def frameStarted(self, frameEvent):
-        if self.overlay:
-            if self.overlayCountdown > 0:
-                self.overlayCountdown -= frameEvent.timeSinceLastFrame
-                if self.overlayCountdown < 5:
-                    self.overlay.hide()
-                    self.overlay = None
-                    #self.overlay = ogre.OverlayManager.getSingleton().getByName('NameCardOverlay')
-                    #self.overlay.show()
-            else:
-                self.overlay.hide()
-                self.overlay = None
+        
+#            if self.overlayCountdown > 0:
+#                self.overlayCountdown -= frameEvent.timeSinceLastFrame
+#                if self.overlayCountdown < 5:
+#                    self.overlay.hide()
+#                    self.overlay = None
+#                    #self.overlay = ogre.OverlayManager.getSingleton().getByName('NameCardOverlay')
+#                    #self.overlay.show()
+#            else:
+#                self.overlay.hide()
+#                self.overlay = None
             
         # Calculate the camera position
         if (self.scn.hasAnimation("CameraTrack")):
@@ -688,9 +688,9 @@ class GomApplication(sf.Application, object):
         self.camera.setAutoTracking(True, self.player.node)
 
         # load up our titlecard
-        self.overlay = None
-        #self.overlay = ogre.OverlayManager.getSingleton().getByName('TitleCardOverlay')
-        #self.overlay.show()
+        #self.overlay = None
+        self.overlay = ogre.OverlayManager.getSingleton().getByName('CurrentLevel')
+        self.overlay.show()
 
 
     def createLights(self):
