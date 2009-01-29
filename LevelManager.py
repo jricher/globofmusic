@@ -22,7 +22,7 @@ import time
 import random
 
 class LevelManager(OgreOde.CollisionListener, object):
-    def __init__(self, app, levels):
+    def __init__(self, app, levels, names):
         OgreOde.CollisionListener.__init__(self)
 
         self.tempo = 90
@@ -53,7 +53,7 @@ class LevelManager(OgreOde.CollisionListener, object):
 
         self.initSounds(app)
 
-        self.initGraphics(app, levels)
+        self.initGraphics(app, levels, names)
 
         self.setCurrentLevel(0)
 
@@ -77,7 +77,7 @@ class LevelManager(OgreOde.CollisionListener, object):
         del self.rootNode
 
         
-    def initGraphics(self, app, levels):
+    def initGraphics(self, app, levels, names):
 
         scn = app.sceneManager
 
@@ -98,6 +98,7 @@ class LevelManager(OgreOde.CollisionListener, object):
 
             if i > 0 and i < n + 1:
                 level = levels[i - 1].Level(i)
+                level.name = names[i - 1]
                 level.cameraAnchor = ogre.Vector3(0, 0, startz + 100 * i)
                 level.playerStart = ogre.Vector3(0, 4, startz - 45 + 100 * i)
 
@@ -114,6 +115,7 @@ class LevelManager(OgreOde.CollisionListener, object):
             elif i == 0:
                 # first room
                 level = BaseLevel(i)
+                level.name = 'Start'
                 level.cameraAnchor = ogre.Vector3(0, 0, startz + 100 * i)
                 level.playerStart = ogre.Vector3(0, 4, startz + 25 + 100 * i)
                 level.arena = makeStartRoom(app, ogre.Vector3(0, 0, startz + 25 + 100 * i), i)
@@ -123,6 +125,7 @@ class LevelManager(OgreOde.CollisionListener, object):
             elif i == n + 1:
                 # final room
                 level = BaseLevel(i)
+                level.name = 'Finish'
                 level.cameraAnchor = ogre.Vector3(0, 0, startz + 100 * i)
                 level.playerStart = ogre.Vector3(0, 4, startz - 125 + 100 * i)
                 level.arena = makeEndRoom(app, ogre.Vector3(0, 0, startz - 25 + 100 * i), i)
@@ -246,7 +249,7 @@ class LevelManager(OgreOde.CollisionListener, object):
         if self.currentLevel == -1:
             self.player.warpTo = (self.levels[level].playerStart)
         
-        print 'Entering level %d' % level
+        print 'Entering level %s (%d)' % (self.levels[level].name, level)
 
         # set the appropriate background music
         if self.currentLevel > 0 and self.levels[self.currentLevel].backgroundMusic:

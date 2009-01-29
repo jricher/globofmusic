@@ -557,6 +557,7 @@ class BaseLevel(object):
         self.offset = None
         self.startLevelCallback = None
         self.wide = False
+        self.name = ''
         
     def __del__(self):
         del self.levelId
@@ -567,6 +568,7 @@ class BaseLevel(object):
         del self.offset
         del self.startLevelCallback
         del self.wide
+        del self.name
 
 class Rupee(Powerup):
     def __init__(self, powerupName, name = None):

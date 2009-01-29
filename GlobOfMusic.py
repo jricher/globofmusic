@@ -662,12 +662,14 @@ class GomApplication(sf.Application, object):
         m = modulefinder.ModuleFinder()
         l = m.find_all_submodules(levels)
         ll = []
+        n = []
         for x in l:
             exec 'import ' + 'levels.' + x
             exec 'print x, dir(levels.' + x + ')'
             exec 'll.append(levels.' + x + ')'
+            n.append(x)
 
-        self.level = LevelManager(self, ll)
+        self.level = LevelManager(self, ll, n)
 
         ###
         ### 
