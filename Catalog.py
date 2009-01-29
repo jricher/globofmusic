@@ -207,7 +207,7 @@ def makeStartRoom(app, offset, i):
     c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, -10), sound='key-0')
     c.quant = 8
     c.key = key
-    key.sources.append(c)
+#    key.sources.append(c)
 
     c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, 10), sound='key-1')
     c.quant = 8
@@ -217,14 +217,14 @@ def makeStartRoom(app, offset, i):
     c = makeUnlockKey(app, offset + ogre.Vector3(10, 2, 0), sound='key-2')
     c.quant = 8
     c.key = key
-    key.sources.append(c)
+#    key.sources.append(c)
 
     #makeBarbell(app, "A Domino", offset + ogre.Vector3(-10,10,0), 0)
 
     c = makeUnlockKey(app, offset + ogre.Vector3(-10, 2, 0), sound='key-3')
     c.quant = 8
     c.key = key
-    key.sources.append(c)
+#    key.sources.append(c)
 
     (leftDoor, rightDoor) = makeSwingingDoors(app, offset + ogre.Vector3(0, 0, 24.5))
 #    leftDoor.lock(app._world)
@@ -232,9 +232,20 @@ def makeStartRoom(app, offset, i):
     key.doors.append(leftDoor)
     key.doors.append(rightDoor)
     
+    def areaClear():
+        overlay = ogre.OverlayManager.getSingleton().getByName('AreaClearOverlay')
+        overlay.show()  
+        c = Container("StartArrow")
+        c.particleSystem = scn.createParticleSystem('arrow', 'Examples/njrGreenyNimbus')
+        c.particleSystem.setKeepParticlesInLocalSpace(True)
+        
+        c.node = root.createChildSceneNode("StartArrow")
+        c.node.setPosition(offset + ogre.Vector3(0,0,-50))
     
+        c.node.attachObject(c.particleSystem)
+        particles["StartArrow"] = c
     
-    
+    key.unlockCallback = areaClear
     
 
     return Arena(floor, walls, i)

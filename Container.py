@@ -561,6 +561,7 @@ class Barbell(Container):
 
 # lookup table for containers
 containers = {}
+particles = {}
 
 
 

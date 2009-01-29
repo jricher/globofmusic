@@ -252,6 +252,11 @@ class LevelManager(OgreOde.CollisionListener, object):
         print 'Entering level %s (%d)' % (self.levels[level].name, level)
         ogre.OverlayManager.getSingleton().getOverlayElement("CurrentLevel/Level").setCaption(self.levels[level].name)
         ogre.OverlayManager.getSingleton().getByName("AreaClearOverlay").hide()
+        if ("StartArrow" in particles):
+            self.decayParticle = True
+            self.particles["StartArrow"] = particles["StartArrow"]
+            self.particleTimeout = 4
+            particles.clear()
 
         # set the appropriate background music
         if self.currentLevel > 0 and self.levels[self.currentLevel].backgroundMusic:
