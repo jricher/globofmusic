@@ -40,7 +40,7 @@ material OuterRing-fired
 		}
 	}
 }
-material InnerRing-done
+material InnerRing-waiting
 {
 	receive_shadows on
 	technique
@@ -54,7 +54,7 @@ material InnerRing-done
 		}
 	}
 }
-material OuterRing-done
+material OuterRing-waiting
 {
 	receive_shadows on
 	technique
@@ -68,7 +68,7 @@ material OuterRing-done
 		}
 	}
 }
-material MiddleRing-waiting
+material MiddleRing-done
 {
 	receive_shadows on
 	technique
@@ -96,7 +96,7 @@ material MiddleRing-armed
 		}
 	}
 }
-material MiddleRing-done
+material MiddleRing-waiting
 {
 	receive_shadows on
 	technique
@@ -138,7 +138,7 @@ material OuterRing-armed
 		}
 	}
 }
-material InnerRing-waiting
+material InnerRing-done
 {
 	receive_shadows on
 	technique
@@ -152,7 +152,7 @@ material InnerRing-waiting
 		}
 	}
 }
-material InnerSphere-done
+material InnerSphere-waiting
 {
 	receive_shadows on
 	technique
@@ -180,7 +180,7 @@ material InnerRing-armed
 		}
 	}
 }
-material OuterRing-waiting
+material OuterRing-done
 {
 	receive_shadows on
 	technique
@@ -194,7 +194,7 @@ material OuterRing-waiting
 		}
 	}
 }
-material InnerSphere-waiting
+material InnerSphere-done
 {
 	receive_shadows on
 	technique

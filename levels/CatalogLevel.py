@@ -21,7 +21,7 @@ class Level(BaseLevel):
         makeCrate(app, 'A Crate', self.offset + ogre.Vector3(140, 1, 20))
         makeBall(app, 'A Ball', self.offset + ogre.Vector3(130, 1, 20))
         makeBarbell(app, 'A Barbell', self.offset + ogre.Vector3(120, 1, 20))
-        makeRupee(app, "A Rupee", self.offset + ogre.Vector3(100,1,20))
+        makeRupee(app, "A Rupee", self.offset + ogre.Vector3(100,3,20))
         
         makePlatform(app, 'A Platform', self.offset + ogre.Vector3(80, 1,20))
         makeTiltingPlatform(app, "A Tilting Platform", self.offset + ogre.Vector3(70, 1,20))
@@ -37,7 +37,7 @@ class Level(BaseLevel):
         #Row 3
         makeDomino(app, "A Domino", self.offset + ogre.Vector3(140,1,-20), 0)
         makeDomino(app, "A Domino Turned", self.offset + ogre.Vector3(120,1,-20), 90)
-        makeUnlockKey(app, self.offset + ogre.Vector3(100,1,-20))
+        makeUnlockKey(app, self.offset + ogre.Vector3(100,2,-20))
         makeSwingingDoors(app, self.offset + ogre.Vector3(80,1,-20))
 
                 
