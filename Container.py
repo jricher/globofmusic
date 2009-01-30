@@ -280,13 +280,13 @@ class Fireable(Container):
 
 
     def collide(self, other, contact, normal, lm):
-        if isinstance(other, Player) and self.arm():
+        if (isinstance(other, Player) or isinstance(other, Fireable)) and self.arm():
             if self.sound and not lm.mm.isFireKeyQueued(self.id):
                 lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id, True)
         return Container.collide(self, other, contact, normal, lm)
         
     def collideWith(self, other, contact, normal, lm):
-        if isinstance(other, Player) and self.arm():
+        if (isinstance(other, Player) or isinstance(other, Fireable)) and self.arm():
             if self.sound and not lm.mm.isFireKeyQueued(self.id):
                 lm.mm.addQueuedSound(self.sound, self.quant, self.rest, self.id, True)
         return False
@@ -456,11 +456,13 @@ class Door(Container):
         del self.locks
         del self.locked
 
-    def lock(self, _world):
+    def lock(self, _world, key):
         # create fixed joint to form a lock
         l = OgreOde.FixedJoint(_world)
         l.attach(self.body)
         self.locks.append(l)
+        if key:
+            key.doors.append(self)
         self.locked = True
         
     def unlock(self):
@@ -503,28 +505,22 @@ class Domino(Fireable):
         if not Fireable:
             return
         Fireable.__del__(self)
-
-    def fire(self):
-        if Fireable.fire(self):
-            pass
-            #if self.geom:
-            #    self.geom.disable()
             
     def collide(self, other, contact, normal, lm):
         if isinstance(other, Domino):
-            contact.setCoulombFriction(100)
+            contact.setCoulombFriction(10)
             contact.setBouncyness(0.1)
-            return True
+            return Fireable.collide(self, other, contact, normal, lm)
         else:
             return Fireable.collide(self, other, contact, normal, lm)
 
     def collideWith(self, other, contact, normal, lm):
         if isinstance(other, Domino):
-            contact.setCoulombFriction(100)
+            contact.setCoulombFriction(10)
             contact.setBouncyness(0.1)
-            return True
+            return Fireable.collideWith(self, other, contact, normal, lm) or True
         else:
-            return Fireable.collide(self, other, contact, normal, lm)
+            return Fireable.collideWith(self, other, contact, normal, lm)
     
 
 class Barbell(Container):

@@ -361,123 +361,6 @@ class LevelManager(OgreOde.CollisionListener, object):
 
                 return col1
 
-    def collideWithDoor(self, me, other, contact, normal):
-
-        # honestly, we don't much care what a door hits
-
-        ## Set the friction at the contact
-        
-        contact.setCoulombFriction( 20 )    # Don't make the doors too sticky
-        contact.setBouncyness(0.5)
-    
-        ## Yes, this collision is valid
-        return True        
-
-    def collideWithPlayer(self, other, contact, normal):
-
-        # note that normal may be flipped on the way in
-        if isinstance(other, ArenaFloor):
-            #print 'got a player and an arena'
-            if not other.hit:
-                #print 'not hit yet'
-                rc = self.setArea(other.arenaId)
-                if not rc == 'CHEATER':
-                    other.hit = True
-                    if self.overlay:
-                        # hide our last overlay
-                        self.overlay.hide()
-                        self.overlay = None
-                        self.overlayTimeout = None
-                    #if other.arenaId == 5:
-                        # last one
-                    #    overlay = ogre.OverlayManager.getSingleton().getByName('CongratsOverlay')
-                    #    overlay.show()
-                    #    self.fireworks()
-        elif isinstance(other, ArenaWalls):
-            ## Set the friction at the contact
-            contact.setCoulombFriction( 10 )    # walls are pretty slick
-            contact.setBouncyness(0.4)
-            return True
-        elif other is self._plane:
-            #print 'Ze Plane!'
-            #print self.playerStarts[self.area]
-            self.player.warpTo = (self.playerStarts[self.area])
-
-        elif isinstance(other, Platform):
-            #print 'Platform'
-            # for now, only platforms can be armed and fired
-            if other.arm():
-                # if we successfully armed this platform, then queue the associated sound
-                if not self.mm.isFireKeyQueued(other.id):
-                    self.mm.addQueuedSound(other.sound, other.quant, other.rest, other.id)
-
-        elif isinstance(other, Door):
-            if other.locked:
-                print 'Locked door!'
-                if self.overlay:
-                    self.overlay.hide()
-                self.overlay = ogre.OverlayManager.getSingleton().getByName('DoorLockedOverlay')
-                self.overlay.show()
-                self.overlayTimeout = 1
-                
-            if other.sound:
-                if not self.mm.isSoundQueued(other.sound):
-                    self.mm.addQueuedSound(other.sound, other.quant, other.rest)
-            contact.setCoulombFriction( 100 ) # doors should be slippery so we don't get stuck
-            contact.setBouncyness(0.1)
-            return True
-        elif isinstance(other, Powerup):
-            #if other.powerupName not in self.player.powerups:
-            other.pickedUp(self.player)
-            other.destroy()
-            print 'Collected %s from %s', (other.powerupName, other.name)
-            if other.sound:
-                if not self.mm.isSoundQueued(other.sound):
-                    self.mm.addQueuedSound(other.sound, other.quant, other.rest)
-            return False # roll right through
-        else:
-            print "What a strange container?!", other.name
-                       
-    
-        ## Set the friction at the contact
-        ## Infinity didn't get exposed :(
-        contact.setCoulombFriction( 9999999999 )    ### OgreOde.Utility.Infinity)
-        contact.setBouncyness(0.4)
-    
-        ## Yes, this collision is valid
-        return True
-    def collideWithPlatform(self, me, other, contact, normal):
-        # note that by now we should be able to tell that 'other' is not a player
-        
-        if isinstance(other, Domino):
-            #If a domino hits a platform, arm the platform
-            if me.arm():
-                # if we successfully armed this platform, then queue the associated sound
-                if not self.mm.isFireKeyQueued(me.id):
-                    self.mm.addQueuedSound(me.sound, me.quant, me.rest, me.id)
-        elif isinstance(other, Arena):
-            # it's harmless to bounce an arena off of this, nothing special
-            pass
-        elif isinstance(other, Door):
-            # doors are likewise harmless, and this actually happens in area 3
-            pass
-        elif isinstance(other, Platform):
-            
-            if me.arm():
-                if not self.mm.isFireKeyQueued(me.id):
-                    self.mm.addQueuedSound(me.sound, me.quant, me.rest, me.id)
-        else:
-            print "%s really shouldn't run into %s" % (str(other.name), str(me.name))
-            
-        ## Set the friction at the contact
-        ## Infinity didn't get exposed :(
-        contact.setCoulombFriction( 9999999999 )    ### OgreOde.Utility.Infinity)
-        contact.setBouncyness(0.4)
-    
-        ## Yes, this collision is valid
-        return True
-
-
     def animate(self, frameEvent):
         t = frameEvent.timeSinceLastFrame
 
@@ -560,21 +443,6 @@ class LevelManager(OgreOde.CollisionListener, object):
             #self.fireWholeMaze()
 
             
-        # TODO: animate fading ramp
-
-#    def fireworks(self):
-#        scn = self.rootNode.getCreator()
-#        c = Container("Fireworks")
-#        c.particleSystem = scn.createParticleSystem('fireworks', 'Examples/njrFireworks')
-#        c.particleSystem.setKeepParticlesInLocalSpace(True)
-#        
-#        c.node = self.rootNode.createChildSceneNode("Fireworks")
-#        c.node.setPosition(0, 0, 375)
-#        
-#        c.node.attachObject(c.particleSystem)
-#        
-#        self.particles["Fireworks"] = c
-        
     def fireworks(self, level):
         if (not self.particles.has_key("Fireworks")):
             scn = self.rootNode.getCreator()
@@ -590,8 +458,8 @@ class LevelManager(OgreOde.CollisionListener, object):
         
             self.particles["Fireworks"] = c
             
-            overlay = ogre.OverlayManager.getSingleton().getByName('CongratsOverlay')
-            overlay.show()
+            #overlay = ogre.OverlayManager.getSingleton().getByName('CongratsOverlay')
+            #overlay.show()
             
     def smoke(self, level):
         if (not self.particles.has_key("Smoke")):

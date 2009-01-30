@@ -202,7 +202,7 @@ def makeStartRoom(app, offset, i):
     walls.geom.setUserData(walls.id)
     
     #Starting Room platform
-    key = MultiPartLock()
+    key = makeLevelLock(app, offset)
 
     c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, -10), sound='key-0')
     c.quant = 8
@@ -227,28 +227,9 @@ def makeStartRoom(app, offset, i):
 #    key.sources.append(c)
 
     (leftDoor, rightDoor) = makeSwingingDoors(app, offset + ogre.Vector3(0, 0, 24.5))
-#    leftDoor.lock(app._world)
-    rightDoor.lock(app._world)
-    key.doors.append(leftDoor)
-    key.doors.append(rightDoor)
+    leftDoor.lock(app._world, key)
+    rightDoor.lock(app._world, key)
     
-    def areaClear():
-        overlay = ogre.OverlayManager.getSingleton().getByName('AreaClearOverlay')
-        overlay.show()  
-        if ("StartArrow" not in particles):
-            c = Container("StartArrow")
-            c.particleSystem = scn.createParticleSystem('arrow', 'Examples/njrGreenyNimbus')
-            c.particleSystem.setKeepParticlesInLocalSpace(True)
-        
-            c.node = root.createChildSceneNode("StartArrow")
-            c.node.setPosition(offset + ogre.Vector3(0,0,-50))
-    
-            c.node.attachObject(c.particleSystem)
-            particles["StartArrow"] = c
-    
-    key.unlockCallback = areaClear
-    
-
     return Arena(floor, walls, i)
     
 

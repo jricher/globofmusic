@@ -37,10 +37,10 @@ class Level(BaseLevel):
         key.sources.append(c)
     
         (leftDoor, rightDoor) = makeSwingingDoors(app, self.offset + ogre.Vector3(0, 0, 50))
-    #    leftDoor.lock(app._world)
-        rightDoor.lock(app._world)
-        key.doors.append(leftDoor)
-        key.doors.append(rightDoor)
+        leftDoor.lock(app._world, key)
+        rightDoor.lock(app._world, key)
+        #key.doors.append(leftDoor)
+        #key.doors.append(rightDoor)
 
 
     def unload(self, app):
