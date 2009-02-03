@@ -363,7 +363,7 @@ def makeSwingingDoors(app, offset):
 
     ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
     c.body = ei.createSingleDynamicBox(20.0, app._world, app._space)
-    c.body.setDamping(0,20)
+    c.body.setDamping(0,2)
     c.geom = c.body.getGeometry(0)
 
     c.joint = OgreOde.HingeJoint(app._world)
@@ -824,7 +824,7 @@ def makePlank(app, name, offset, angle=0, sound=None):
     rootNode = scn.getRootSceneNode()
     name = name + str(offset)
 
-    c = Platform(name)
+    c = Platform(name, materialName="Plank-")
     containers[c.id] = c
     c.ent = scn.createEntity(name, "Plank.mesh")
     c.ent.setCastShadows(True)
@@ -834,9 +834,11 @@ def makePlank(app, name, offset, angle=0, sound=None):
     c.node.setPosition(offset)
     quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
     c.node.setOrientation(quat)
+    #print 'scale', str(c.node.getScale())
+    #print '  mtx', str(ogre.Matrix4.getScale(c.node.getScale()))
     ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
-    c.body = ei.createSingleDynamicBox(5.0,app._world, app._space)
-    c.body.setDamping(2,2)
+    c.body = ei.createSingleDynamicBox(0.5,app._world, app._space)
+    c.body.setDamping(2, 2)
     c.geom = c.body.getGeometry(0)
     c.geom.setUserData(c.id)
 
@@ -956,7 +958,47 @@ def makeBell(app, name, offset, sound=None):
     if sound:
         c.sound = app.sounds[sound]
     else:
-        c.sound = app.sounds['bell-%d' % random.randrange(6)]
+        c.sound = app.sounds['bell-%d' % random.randrange(2)]
         
 
     return c
+
+
+def makeBridge(app, name, offset):
+
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    name = name + str(offset)
+    
+
+    start = makePlank(app, name+'start', offset + ogre.Vector3(0, 0, -5))
+    #l = OgreOde.FixedJoint(app._world)
+    #l.attach(start.body)
+
+    start.anchor = OgreOde.HingeJoint(app._world)
+    start.anchor.attach(start.body)
+    start.anchor.setAxis(ogre.Vector3().UNIT_X)
+    start.anchor.setAnchor(offset + ogre.Vector3(0, 0, -5.5))
+
+    prev = start
+    for z in range(-4, 5):
+        plank = makePlank(app, name + str(z), offset + ogre.Vector3(0, -((5 - abs(z)) / 10.0), z))        
+        plank.joint = OgreOde.HingeJoint(app._world)
+        plank.joint.attach(prev.body, plank.body)
+        plank.joint.setAxis(ogre.Vector3().UNIT_X)
+        #print 'hinge:', str((plank.body.getPosition() + prev.body.getPosition()) / 2)
+        plank.joint.setAnchor((plank.body.getPosition() + prev.body.getPosition()) / 2)
+        prev = plank
+
+
+    end = makePlank(app, name+'end', offset + ogre.Vector3(0, 0, 5))
+
+    end.joint = OgreOde.HingeJoint(app._world)
+    end.joint.attach(prev.body, end.body)
+    end.joint.setAxis(ogre.Vector3().UNIT_X)
+    end.joint.setAnchor((end.body.getPosition() + prev.body.getPosition()) / 2)
+
+    end.anchor = OgreOde.HingeJoint(app._world)
+    end.anchor.attach(end.body)
+    end.anchor.setAxis(ogre.Vector3().UNIT_X)
+    end.anchor.setAnchor(offset + ogre.Vector3(0, 0, 5.5))

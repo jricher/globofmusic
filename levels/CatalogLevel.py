@@ -34,6 +34,8 @@ class Level(BaseLevel):
         makeUpDownRamp(app, 'An Up Down Ramp', self.offset + ogre.Vector3(100, 1, 0))
         makeCornerRamp(app, 'A Corner Ramp', self.offset + ogre.Vector3(80, 1, 0))
         makeOnOffRamp(app, 'An On Off Ramp turned', self.offset + ogre.Vector3(60, 1, 0), 45)
+        makeBridge(app, 'A bridge', self.offset + ogre.Vector3(50, 2.5, 0))
+        
         
         #Row 3
         makeDomino(app, "A Domino", self.offset + ogre.Vector3(140,1,-20), 0)
