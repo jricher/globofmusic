@@ -202,33 +202,25 @@ def makeStartRoom(app, offset, i):
     walls.geom.setUserData(walls.id)
     
     #Starting Room platform
-    key = makeLevelLock(app, offset)
+    lock = makeLevelLock(app, offset)
 
     c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, -10), sound='key-0')
     c.quant = 8
-    c.key = key
-#    key.sources.append(c)
 
-    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, 10), sound='key-1')
+    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, 10), sound='key-1', lock=lock)
     c.quant = 8
-    c.key = key
-    key.sources.append(c)
 
     c = makeUnlockKey(app, offset + ogre.Vector3(10, 2, 0), sound='key-2')
     c.quant = 8
-    c.key = key
-#    key.sources.append(c)
 
     #makeBarbell(app, "A Domino", offset + ogre.Vector3(-10,10,0), 0)
 
     c = makeUnlockKey(app, offset + ogre.Vector3(-10, 2, 0), sound='key-3')
     c.quant = 8
-    c.key = key
-#    key.sources.append(c)
 
     (leftDoor, rightDoor) = makeSwingingDoors(app, offset + ogre.Vector3(0, 0, 24.5))
-    leftDoor.lock(app._world, key)
-    rightDoor.lock(app._world, key)
+    leftDoor.lock(app._world, lock)
+    rightDoor.lock(app._world, lock)
     
     return Arena(floor, walls, i)
     
@@ -299,6 +291,9 @@ def makePlatform(app, name, offset, material='platform0-', sound=None):
 
     if sound:
         c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['tone-%d' % random.randrange(8)]
+                             
 
     c.geom.setUserData(c.id)
 
@@ -337,6 +332,8 @@ def makeTiltingPlatform(app, name, offset, material='platform0-', sound=None):
 
     if sound:
         c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['tone-%d' % random.randrange(8)]
 
     # set the initial material
     c.setMaterial()
@@ -410,7 +407,7 @@ def makeSwingingDoors(app, offset):
     return doors
 
 
-def makeUnlockKey(app, offset, sound='key-0'):
+def makeUnlockKey(app, offset, sound='key-0', lock=None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     
@@ -449,6 +446,12 @@ def makeUnlockKey(app, offset, sound='key-0'):
 
     if sound:
         c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['key-%d' % random.randrange(4)]
+
+    if lock:
+        c.key = lock
+        lock.sources.append(c)
 
     # set the initial material
     c.setMaterial()
@@ -481,6 +484,8 @@ def makeIcePlatform(app, name, offset, angle=0, material = None, sound=None):
     
     if sound:
         c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['tone-%d' % random.randrange(8)]
 
     # set the initial material
     c.setMaterial()
@@ -515,6 +520,8 @@ def makeCornerRamp(app, name, offset, angle=0, material = 'platform0-', sound=No
     
     if sound:
         c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['perc-%d' % random.randrange(6)]
 
     # set the initial material
     c.setMaterial()
@@ -546,6 +553,8 @@ def makeStraightRamp(app, name, offset, angle=0, material = 'platform0-', sound=
     
     if sound:
         c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['tone-%d' % random.randrange(8)]
 
     # set the initial material
     c.setMaterial()
@@ -579,6 +588,8 @@ def makeUpDownRamp(app, name, offset, angle=0, material = 'platform0-', sound=No
     
     if sound:
         c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['perc-%d' % random.randrange(6)]
 
     # set the initial material
     c.setMaterial()
@@ -610,6 +621,8 @@ def makeOnOffRamp(app, name, offset, angle=0, material = 'platform0-', sound=Non
     
     if sound:
         c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['perc-%d' % random.randrange(6)]
 
     # set the initial material
     c.setMaterial()
@@ -649,6 +662,8 @@ def makeDomino(app, name, offset, angle=0, material = 'Domino-', sound=None):
 
     if sound:
         c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['perc-%d' % random.randrange(6)]
 
     c.geom.setUserData(c.id)
 
@@ -718,7 +733,7 @@ def makeBarbell(app, name, offset, angle=0):
 
     return c
     
-def makeRupee(app, name, offset):
+def makeRupee(app, name, offset, sound=None):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     name = name + str(offset)
@@ -773,13 +788,17 @@ def makeRupee(app, name, offset):
     c.motor.setParameter(OgreOde.Joint.Parameter_MaximumForce, 5, 3)
     c.motor.setParameter(OgreOde.Joint.Parameter_MotorVelocity, 0, 3)
     
+    if sound:
+        c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['bell-%d' % random.randrange(6)]
 
     c.geom.setUserData(c.id)
 
     return c
 
 def makeLevelLock(app, offset):
-    key = MultiPartLock()
+    lock = MultiPartLock()
     def areaClear():
         scn = app.sceneManager
         root = scn.getRootSceneNode()
@@ -796,17 +815,14 @@ def makeLevelLock(app, offset):
             c.node.attachObject(c.particleSystem)
             particles["StartArrow"] = c
         
-    key.unlockCallback = areaClear
+    lock.unlockCallback = areaClear
     
-    return key
+    return lock
 
-def makePlank(app, name, offset, angle=0):
+def makePlank(app, name, offset, angle=0, sound=None):
     scn = app.sceneManager
     rootNode = scn.getRootSceneNode()
     name = name + str(offset)
-
-    # make dominoes float properly
-    offset = offset + ogre.Vector3(0, 2.1, 0)
 
     c = Platform(name)
     containers[c.id] = c
@@ -826,6 +842,11 @@ def makePlank(app, name, offset, angle=0):
 
     c.setMaterial()
 
+    if sound:
+        c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['tone-%d' % random.randrange(8)]
+
     return c
 
 def makeDonut(app, name, offset, angle=0):
@@ -833,7 +854,7 @@ def makeDonut(app, name, offset, angle=0):
     root = scn.getRootSceneNode()
     name = name + str(offset)
     
-    c = Platform(name)
+    c = Container(name)
     containers[c.id] = c
     c.ent = scn.createEntity(name, 'Donut.mesh')
     c.node = root.createChildSceneNode(name)
@@ -865,12 +886,35 @@ def makeDonut(app, name, offset, angle=0):
 
 def makeBallBearing(app, name, offset, angle=0):
     scn = app.sceneManager
+    rootNode = scn.getRootSceneNode()
+    name = name + str(offset)
+    
+    c = Container(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, "BallBearing.mesh")
+    c.ent.setCastShadows(True)
+    c.node = rootNode.createChildSceneNode(c.ent.getName())
+    c.node.attachObject(c.ent)
+    c.node.setPosition(offset)
+
+    ei = OgreOde.EntityInformer(c.ent, ogre.Matrix4.getScale(c.node.getScale()))
+    c.body = ei.createSingleDynamicSphere(10.0, app._world, app._space)
+
+    c.geom = c.body.getGeometry(0)
+
+    c.geom.setUserData(c.id)
+
+    return c
+
+def makeBell(app, name, offset, sound=None):
+    scn = app.sceneManager
     root = scn.getRootSceneNode()
     name = name + str(offset)
     
-    c = Fireable(name)
+
+    c = Fireable(name, materialName='Bell-')
     containers[c.id] = c
-    c.ent = scn.createEntity(name, 'BallBearing.mesh')
+    c.ent = scn.createEntity(name, 'Bell.mesh')
     c.node = root.createChildSceneNode(name)
     c.node.attachObject(c.ent)
 
@@ -881,15 +925,38 @@ def makeBallBearing(app, name, offset, angle=0):
 
     c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
     c.node.attachObject(c.body)
-    mass = OgreOde.BoxMass (2.0, ei.getSize())
-    mass.setDensity(0.5, ei.getSize())
+    mass = OgreOde.BoxMass (5.5, ei.getSize())
+    mass.setDensity(0.10, ei.getSize())
     c.body.setMass(mass)
     
     c.geom.setBody(c.body)
     c.ent.setUserObject(c.geom)
     
     c.body.setPosition(offset)
+     
+    c.joint = OgreOde.HingeJoint(app._world)
+    c.joint.attach(c.body)
+    c.joint.setAxis(ogre.Vector3().UNIT_X)
+    c.joint.setAnchor(ogre.Vector3(0, 6, 0) + offset)
+
+    c.motor = OgreOde.AngularMotorJoint(app._world)
+    c.motor.setAnchor(offset)
+    c.motor.attach(c.body)
+    c.motor.setAxisCount(1)
+    c.motor.setAxis(0, OgreOde.AngularMotorJoint.RelativeOrientation_GlobalFrame, ogre.Vector3().UNIT_X)
+
+    c.motor.setMode(OgreOde.AngularMotorJoint.Mode_UserAngularMotor)
+    c.motor.setAngle(0, 0)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MaximumForce, 5, 1)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MotorVelocity, 0, 1)
 
     c.geom.setUserData(c.id)
+
+
+    if sound:
+        c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['bell-%d' % random.randrange(6)]
+        
 
     return c
