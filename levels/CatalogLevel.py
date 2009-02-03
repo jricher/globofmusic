@@ -46,6 +46,8 @@ class Level(BaseLevel):
         makePlank(app, "A Plank", self.offset + ogre.Vector3(50,1,-20), 45)
         makeBallBearing(app, "A Ball Bearing", self.offset + ogre.Vector3(40,2,-20))
         makeBell(app, 'A Bell', self.offset + ogre.Vector3(30, 1, -20))
+        
+        makeBowlingPin(app, "A Bowling Pin", self.offset + ogre.Vector3(0, 0.01, -80))
 
                 
 
