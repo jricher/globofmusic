@@ -69,8 +69,11 @@ class LevelManager(OgreOde.CollisionListener, object):
         del self.levels[:]
         del self.player
         del self._plane
-        if self.particles: self.particleSystemCleanup()
+        if self.particles: 
+            for name in particles.keys():
+                self.particleSystemCleanup(name)
         containers.clear()
+        particles.clear()
         del self.animations[:]
         if self.overlay:
             del self.overlay
@@ -120,7 +123,7 @@ class LevelManager(OgreOde.CollisionListener, object):
                 level.playerStart = ogre.Vector3(0, 4, startz + 25 + 100 * i)
                 level.arena = makeStartRoom(app, ogre.Vector3(0, 0, startz + 25 + 100 * i), i)
                
-                #level.startLevelCallback = self.smoke
+                #level.startLevelCallback = self.snow
                 self.levels.append(level)
             elif i == n + 1:
                 # final room
@@ -132,9 +135,6 @@ class LevelManager(OgreOde.CollisionListener, object):
                 level.startLevelCallback = self.fireworks
                     
                 self.levels.append(level)
-
-        #(leftDoor, rightDoor) = makeSwingingDoors(app, ogre.Vector3(0, 0, 25))
-
 
     def initSounds(self, app):
         sm = app.soundManager
@@ -233,7 +233,7 @@ class LevelManager(OgreOde.CollisionListener, object):
         '''
         Set our current level
         '''
-
+        print particles
         if level == self.currentLevel:
             print 'Error: entering current level'
             return
@@ -256,7 +256,7 @@ class LevelManager(OgreOde.CollisionListener, object):
             self.decayParticle = True
             self.particles["StartArrow"] = particles["StartArrow"]
             self.particleTimeout = 4
-            particles.clear()
+            del particles["StartArrow"]
 
         # set the appropriate background music
         if self.currentLevel > 0 and self.levels[self.currentLevel].backgroundMusic:
@@ -272,6 +272,8 @@ class LevelManager(OgreOde.CollisionListener, object):
             self.mm.addQueuedSound(self.defaultBackgroundMusic, self.mm.totalBeats)
         
         #trigger any animation
+        if (self.levels[oldlevel].stopLevelCallback):
+                self.levels[oldlevel].stopLevelCallback(self.levels[oldlevel])
         if (self.levels[self.currentLevel].startLevelCallback):
                 self.levels[self.currentLevel].startLevelCallback(self.levels[self.currentLevel])
         
@@ -377,7 +379,7 @@ class LevelManager(OgreOde.CollisionListener, object):
             self.particleTimeout -= t
             if self.particleTimeout < 0:
                 self.particleTimeout = None
-                self.particleSystemCleanup()
+                self.particleSystemCleanup("StartArrow")
                 self.decayParticle = False
 
         # step through all animations and check for dead ones
@@ -408,41 +410,7 @@ class LevelManager(OgreOde.CollisionListener, object):
             self.animations.remove(d)
 
         del dead
-        
-
-
  
-
-    def areaClear(self):
-        print 'Area clear!'
-        if self.overlay:
-            self.overlay.hide()
-        if self.overlayTimeout != None:
-            self.overlayTimeout = None
-        
-        self.overlay = ogre.OverlayManager.getSingleton().getByName('AreaClearOverlay')
-        self.overlay.show()
-        
-        if self.area == 1:
-            self.loadArea1()
-            if self.ramps:
-                for id in self.ramps:
-                    if containers[id].body:
-                        containers[id].body.wake()
-                    del containers[id]
-                del self.ramps[:]
-            self.startingArrow(-40)
-        elif self.area == 2:
-            self.loadArea2()
-            self.startingArrow(100-40)
-        elif self.area == 3:
-            self.loadArea3()
-            self.startingArrow(200-40)
-        elif self.area == 4: 
-            self.startingArrow(300-40)
-            #self.fireWholeMaze()
-
-            
     def fireworks(self, level):
         if (not self.particles.has_key("Fireworks")):
             scn = self.rootNode.getCreator()
@@ -461,22 +429,22 @@ class LevelManager(OgreOde.CollisionListener, object):
             #overlay = ogre.OverlayManager.getSingleton().getByName('CongratsOverlay')
             #overlay.show()
             
-    def smoke(self, level):
-        if (not self.particles.has_key("Smoke")):
+    def snow(self, level):
+        if (not self.particles.has_key("Snow")):
             scn = self.rootNode.getCreator()
-            c = Container("Smoke")
-            c.particleSystem = scn.createParticleSystem('smoke', 'Snow')
+            c = Container("Snow")
+            c.particleSystem = scn.createParticleSystem('snow', 'Snow')
             c.particleSystem.setKeepParticlesInLocalSpace(True)
             
-            c.node = self.rootNode.createChildSceneNode("Smoke")
-            #c.node = self.player.node.createChildSceneNode("Smoke")  #for extra kicks, attach to the player
+            c.node = self.rootNode.createChildSceneNode("Snow")
+            #c.node = self.player.node.createChildSceneNode("Snow")  #for extra kicks, attach to the player
             #c.node.setPosition(0, 0, 375)
-            print "Smoke: ", level.cameraAnchor.x, level.cameraAnchor.y, level.cameraAnchor.z
+            print "Snow: ", level.cameraAnchor.x, level.cameraAnchor.y, level.cameraAnchor.z
             c.node.setPosition(level.cameraAnchor + ogre.Vector3(0,0,25))
             
             c.node.attachObject(c.particleSystem)
             
-            self.particles["Smoke"] = c
+            self.particles["Snow"] = c
             
     def startingArrow(self, offset):
         scn = self.rootNode.getCreator()
@@ -498,14 +466,16 @@ class LevelManager(OgreOde.CollisionListener, object):
         self.particles["StartArrow"] = c
         self.particleTimeout = 4
         
-    def particleSystemCleanup(self):
+    def particleSystemCleanup(self, name):
         #self.particles["StartArrow"].particleSystem.removeAllEmitters()
-        scn = self.rootNode.getCreator()
-        c = self.particles["StartArrow"]
-        scn.destroyParticleSystem(c.particleSystem)
-        del c.particleSystem
-        scn.destroySceneNode(c.node.getName())
-        self.particles.clear()
+        if (name in self.particles):
+            scn = self.rootNode.getCreator()
+            c = self.particles[name]
+            scn.destroyParticleSystem(c.particleSystem)
+            del c.particleSystem
+            scn.destroySceneNode(c.node.getName())
+            del self.particles[name]
+        
 
     def resetPlayer(self):
         self.player.warpTo = self.levels[self.currentLevel].playerStart

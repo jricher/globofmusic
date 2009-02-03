@@ -570,6 +570,7 @@ class BaseLevel(object):
         self.arena = None
         self.offset = None
         self.startLevelCallback = None
+        self.stopLevelCallback = None
         self.wide = False
         self.name = ''
         
@@ -581,6 +582,7 @@ class BaseLevel(object):
         del self.arena
         del self.offset
         del self.startLevelCallback
+        del self.stopLevelCallback
         del self.wide
         del self.name
 

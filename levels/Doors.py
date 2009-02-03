@@ -41,6 +41,36 @@ class Level(BaseLevel):
         rightDoor.lock(app._world, key)
         #key.doors.append(leftDoor)
         #key.doors.append(rightDoor)
+        
+        def snow(level):
+            if ("Snow" not in particles):
+                scn = app.sceneManager
+                root = scn.getRootSceneNode()
+                c = Container("Snow")
+                c.particleSystem = scn.createParticleSystem('snow', 'Snow')
+                c.particleSystem.setKeepParticlesInLocalSpace(True)
+                
+                c.node = root.createChildSceneNode("Snow")
+                #c.node = self.player.node.createChildSceneNode("Snow")  #for extra kicks, attach to the player
+                #c.node.setPosition(0, 0, 375)
+                print "Snow: ", level.cameraAnchor.x, level.cameraAnchor.y, level.cameraAnchor.z
+                c.node.setPosition(level.cameraAnchor + ogre.Vector3(0,0,25))
+                
+                c.node.attachObject(c.particleSystem)
+                
+                particles["Snow"] = c
+        self.startLevelCallback = snow 
+        
+        def stopSnow(level):
+            if ("Snow" in particles):
+                scn = app.sceneManager
+                root = scn.getRootSceneNode()
+                c = particles["Snow"]
+                scn.destroyParticleSystem(c.particleSystem)
+                del c.particleSystem
+                scn.destroySceneNode(c.node.getName())
+                del particles["Snow"]
+        self.stopLevelCallback = stopSnow
 
 
     def unload(self, app):
