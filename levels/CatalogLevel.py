@@ -39,6 +39,9 @@ class Level(BaseLevel):
         makeDomino(app, "A Domino Turned", self.offset + ogre.Vector3(120,1,-20), 90)
         makeUnlockKey(app, self.offset + ogre.Vector3(100,2,-20))
         makeSwingingDoors(app, self.offset + ogre.Vector3(80,1,-20))
+        makeDonut(app, "A Donut", self.offset + ogre.Vector3(60,2,-20))
+        makePlank(app, "A Plank", self.offset + ogre.Vector3(50,1,-20), 45)
+        makeBallBearing(app, "A Ball Bearing", self.offset + ogre.Vector3(40,2,-20))
 
                 
 

@@ -784,17 +784,112 @@ def makeLevelLock(app, offset):
         scn = app.sceneManager
         root = scn.getRootSceneNode()
         overlay = ogre.OverlayManager.getSingleton().getByName('AreaClearOverlay')
-        overlay.show()  
-        c = Container("StartArrow")
-        c.particleSystem = scn.createParticleSystem('arrow', 'Examples/njrGreenyNimbus')
-        c.particleSystem.setKeepParticlesInLocalSpace(True)
+        overlay.show()
+        if ("StartArrow" not in particles):  
+            c = Container("StartArrow")
+            c.particleSystem = scn.createParticleSystem('arrow', 'Examples/njrGreenyNimbus')
+            c.particleSystem.setKeepParticlesInLocalSpace(True)
         
-        c.node = root.createChildSceneNode("StartArrow")
-        c.node.setPosition(offset + ogre.Vector3(0,0,-50))
+            c.node = root.createChildSceneNode("StartArrow")
+            c.node.setPosition(offset + ogre.Vector3(0,0,-50))
     
-        c.node.attachObject(c.particleSystem)
-        particles["StartArrow"] = c
+            c.node.attachObject(c.particleSystem)
+            particles["StartArrow"] = c
         
     key.unlockCallback = areaClear
     
     return key
+
+def makePlank(app, name, offset, angle=0):
+    scn = app.sceneManager
+    rootNode = scn.getRootSceneNode()
+    name = name + str(offset)
+
+    # make dominoes float properly
+    offset = offset + ogre.Vector3(0, 2.1, 0)
+
+    c = Platform(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, "Plank.mesh")
+    c.ent.setCastShadows(True)
+    c.node = rootNode.createChildSceneNode(c.ent.getName())
+    c.node.attachObject(c.ent)
+    c.startPosition = offset
+    c.node.setPosition(offset)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
+    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    c.body = ei.createSingleDynamicBox(5.0,app._world, app._space)
+    c.body.setDamping(2,2)
+    c.geom = c.body.getGeometry(0)
+    c.geom.setUserData(c.id)
+
+    c.setMaterial()
+
+    return c
+
+def makeDonut(app, name, offset, angle=0):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    name = name + str(offset)
+    
+    c = Platform(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'Donut.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
+    c.node.attachObject(c.body)
+    mass = OgreOde.BoxMass (20.0, ei.getSize())
+    mass.setDensity(5.0, ei.getSize())
+    c.body.setMass(mass)
+    
+    c.geom.setBody(c.body)
+    c.ent.setUserObject(c.geom)
+    
+    c.body.setPosition(offset)
+
+    c.joint = OgreOde.BallJoint(app._world)
+    c.joint.attach(c.body)
+    c.joint.setAnchor(offset)
+
+    c.geom.setUserData(c.id)
+
+    return c
+
+def makeBallBearing(app, name, offset, angle=0):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    name = name + str(offset)
+    
+    c = Fireable(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'BallBearing.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
+    c.node.attachObject(c.body)
+    mass = OgreOde.BoxMass (2.0, ei.getSize())
+    mass.setDensity(0.5, ei.getSize())
+    c.body.setMass(mass)
+    
+    c.geom.setBody(c.body)
+    c.ent.setUserObject(c.geom)
+    
+    c.body.setPosition(offset)
+
+    c.geom.setUserData(c.id)
+
+    return c
