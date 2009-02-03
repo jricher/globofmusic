@@ -10,7 +10,7 @@ import ogre.renderer.OGRE as ogre
 import ogre.physics.OgreOde as OgreOde
 import ogre.sound.OgreAL as OgreAL
 import ogre.io.OIS as OIS
-import SampleFramework as sf
+
 
 from MusicManager import MusicManager
 from Container import *

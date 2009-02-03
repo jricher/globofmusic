@@ -18,7 +18,7 @@ import ogre.renderer.OGRE as ogre
 import ogre.physics.OgreOde as OgreOde
 import ogre.sound.OgreAL as OgreAL
 import ogre.io.OIS as OIS
-import SampleFramework as sf
+from ogre.renderer.OGRE.sf_OIS import * 
 import os
 import math
 from MusicManager import MusicManager
@@ -32,21 +32,10 @@ from LevelManager import LevelManager
 import modulefinder
 import levels
 
-# don't think we need this one, seriously
-# import PythonOgreConfig
-
-WINDOWS = (os.name == 'nt')
 JOYDEBUG = False  #set to True to see the raw joystick values
-WIIMOTE = False
-SWEET_LIGHTS = False  #this really slows things down, so use with caution
+
 #Xbox mapping (requires xboxmapping.xgi)
 BUTTON_MAP = { 0:"A", 1:"B", 2:"X", 3:"Y", 4:"Black", 5:"White", 6:"Start", 7:"Back" , 8:"LeftStick", 9:"RightStick", 10:"Left", 11:"Right", 23:"D_Down", 22:"D_Right", 21:"D_Left", 20:"D_Up"}
-
-PHYSICAL_WIIMOTE_BUTTON_MAP = { 0:"A", 1:"B", 2:"C", 3:"Z", 4:"Minus", 5:"Plus", 6:"Home", 7:"1", 8:"2", 9:"D_Up", 10:"D_Down", 11:"D_Left", 12:"D_Right"}
-#Modify this one to change the key bindings to what you want.
-WIIMOTE_BUTTON_MAP = { 0:"A", 1:"A", 2:"X", 3:"Y", 4:"White", 5:"Black", 6:"Start", 7:"1", 8:"2", 9:"D_Up", 10:"D_Down", 11:"D_Left", 12:"D_Right"}
-#I'm guessing on these linux mappings
-LINUX_BUTTON_MAP = { 5:"A", 4:"B", 3:"X", 2:"Y", 1:"Black", 0:"White", 6:"Start", 7:"Back", 8:"Left", 9:"Right" }
 
 
 ##
@@ -56,17 +45,11 @@ LINUX_BUTTON_MAP = { 5:"A", 4:"B", 3:"X", 2:"Y", 1:"Black", 0:"White", 6:"Start"
 STEP_RATE=0.01
 ANY_QUERY_MASK                  = 1<<0
 
-# Custom parameter bindings
-CUSTOM_SHININESS = 1
-CUSTOM_DIFFUSE = 2
-CUSTOM_SPECULAR = 3
-
-
 ##
 
-class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
+class GomFrameListener(FrameListener, OgreOde.StepListener, object):
     def __init__(self, app, renderWindow, camera):
-        sf.FrameListener.__init__(self, renderWindow, camera)
+        FrameListener.__init__(self, renderWindow, camera)
         OgreOde.StepListener.__init__(self)
         
         # copy references to the pieces we care about
@@ -77,7 +60,6 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         self.overlay = app.overlay
         self.overlayCountdown = 8
 
-        self.lights = app.lights
         
         app._stepper.setStepListener(self)
         
@@ -106,8 +88,7 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         del self.overlay
         del self.altitude
         del self.azimuth
-        del self.lights[:]
-        sf.FrameListener.__del__(self)
+        FrameListener.__del__(self)
         print 'FrameListener unloaded'
     
     def frameStarted(self, frameEvent):
@@ -156,34 +137,8 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
             #self.camera.moveRelative(ogre.Vector3(self.xcAxis, -self.ycAxis,0.0))
             node = self.camera.getParentSceneNode()
             node.setPosition(p_1)
-            
-
-        ## animate the lights
-        if SWEET_LIGHTS:
-            ## yeah, this is a weird hack with way too many constants...
-            b = self.musicManager.currentBeat % 16
-    
-            lightPositions = [ogre.Vector3(50,50,50), ogre.Vector3(50,50,-50), ogre.Vector3(-50,50,-50), ogre.Vector3(-50,50,50)]
-            lightColors = [ogre.ColourValue(1.0, 0.0, 0.0), ogre.ColourValue(0,0,1), ogre.ColourValue(1,1,0),ogre.ColourValue(1.0,0,1.0)]
-            for i in range(len(self.lights)):
-                l = self.lights[i]
-                color = l.getDiffuseColour()
-                color.r *= 0.95
-                color.g *= 0.95
-                color.b *= 0.95
-                l.setDiffuseColour(color)
-                l.setSpecularColour(color)
-                p = self.level.cameraPositions[self.level.area] + lightPositions[i]
-                p2 = ogre.Vector3(p.x, p.y, p.z)
-                l.setPosition(p2)
-                l.setDirection(self.player.node.getPosition()- p2)
-            
-            #Boost the beat light
-            l = self.lights[b/4]
-            l.setDiffuseColour(lightColors[b/4])
-            l.setSpecularColour(lightColors[b/4])
-        
-        result = sf.FrameListener.frameStarted(self,frameEvent)
+                    
+        result = FrameListener.frameStarted(self,frameEvent)
         
         while self.musicManager.fireKeys:
             key = self.musicManager.fireKeys.pop(0)
@@ -209,15 +164,13 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         return result
 
     def frameEnded(self, frameEvent):
-        result = sf.FrameListener.frameEnded(self,frameEvent)
+        result = FrameListener.frameEnded(self,frameEvent)
 
         # give some time for the audio processing thread
         time.sleep(0.001)
         
         return result
      
-
-        
     def windowClosed(self, rw):
         # need to override this so that the system gets properly cleaned up
         if( rw == self.renderWindow ):
@@ -234,22 +187,6 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
 
     def _processUnbufferedKeyInput(self, frameEvent):
 
-        #sf.FrameListener._processUnbufferedKeyInput(self, frameEvent)
-
-        # force area selection
-        # These don't make any sense any more
-        #if self.Keyboard.isKeyDown(OIS.KC_1):
-        #    self.level.setArea(1)
-        #elif self.Keyboard.isKeyDown(OIS.KC_2):
-        #    self.level.setArea(2)
-        #elif self.Keyboard.isKeyDown(OIS.KC_3):
-        #    self.level.setArea(3)
-        #elif self.Keyboard.isKeyDown(OIS.KC_4):
-        #    self.level.setArea(4)
-
-        #if self._isToggleKeyDown(OIS.KC_E):
-        #    self.level.triggerRandomSounds()
-
         # quit command
         if self.Keyboard.isKeyDown(OIS.KC_ESCAPE) or self.Keyboard.isKeyDown(OIS.KC_Q):
             print 'Quitting'
@@ -264,7 +201,7 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
         #print self.level.camera.getRealPosition()
         
         # Joystick processing
-        #print self.InputManager.numJoySticks()
+        #print "NumberOfDevices:" + str(self.InputManager.getNumberOfDevices(OIS.Type.OISJoyStick))
         if (self.Joy) :
             joyState = self.Joy.getJoyStickState()
             if (JOYDEBUG) :
@@ -276,60 +213,20 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
                 for axis in range(self.Joy.axes()):
                     print 'Axis %d: ' % axis,
                     print joyState.mAxes[axis].abs
-            #Xbox bindings
-            
-
+                      
             # check the axes
-            if (WINDOWS):
-                if (WIIMOTE):
-                    self.xAxis = joyState.mAxes[3].abs / 32768.0
-                    self.yAxis = joyState.mAxes[4].abs / 32768.0
-                    #self.xcAxis = -joyState.mAxes[0].abs / (32768.0*4)
-                    #self.ycAxis = joyState.mAxes[2].abs / (32768.0*4)
-                    #self.zcAxis = joyState.mAxes[1].abs / 32768.0
-                    # We need a larger dead zone for the nunchuck
-                    if (self.xAxis > -0.2 and self.xAxis < 0.2): self.xAxis = 0
-                    if (self.yAxis > -0.2 and self.yAxis < 0.2): self.yAxis = 0
-                    if (self.zAxis > -0.2 and self.zAxis < 0.2): self.zAxis = 0
-                    
-                    #Large dead zone for the Accelerometers too
-                    if (self.xcAxis > -0.2 and self.xcAxis < 0.2): self.xcAxis = 0
-                    if (self.ycAxis > -0.2 and self.ycAxis < 0.2): self.ycAxis = 0
-                    
-                    for button in range(self.Joy.buttons()) :
-                        if joyState.buttonDown(button):
-                            self.buttons.add(WIIMOTE_BUTTON_MAP[button])
-
-                    
-                else: #Xbox Controller
-                    self.xAxis = joyState.mAxes[3].abs / 32768.0
-                    self.yAxis = joyState.mAxes[2].abs / 32768.0
-                    self.xcAxis = joyState.mAxes[1].abs / 32768.0
-                    self.ycAxis = -joyState.mAxes[0].abs / 32768.0
-                    if (self.xAxis > -0.1 and self.xAxis < 0.1): self.xAxis = 0
-                    if (self.yAxis > -0.1 and self.yAxis < 0.1): self.yAxis = 0
-                    if (self.zAxis > -0.1 and self.zAxis < 0.1): self.zAxis = 0
-                    if (self.xcAxis > -0.1 and self.xcAxis < 0.1): self.xcAxis = 0
-                    if (self.ycAxis > -0.1 and self.ycAxis < 0.1): self.ycAxis = 0
-                    for button in range(self.Joy.buttons()) :
-                        if joyState.buttonDown(button):
-                            self.buttons.add(BUTTON_MAP[button])
-                            
-            else : #Linux mappings
-                self.xAxis = joyState.mAxes[0].abs / 32768.0
-                self.yAxis = joyState.mAxes[1].abs / 32768.0
-                self.zAxis = joyState.mAxes[2].abs / 32768.0
-                self.xcAxis = joyState.mAxes[3].abs / 32768.0
-                self.ycAxis = joyState.mAxes[4].abs / 32768.0
-                self.zcAxis = joyState.mAxes[5].abs / 32768.0
-                if (self.xAxis > -0.2 and self.xAxis < 0.2): self.xAxis = 0
-                if (self.yAxis > -0.2 and self.yAxis < 0.2): self.yAxis = 0
-                if (self.zAxis > -0.2 and self.zAxis < 0.2): self.zAxis = 0
-                if (self.xcAxis > -0.2 and self.xcAxis < 0.2): self.xcAxis = 0
-                if (self.ycAxis > -0.2 and self.ycAxis < 0.2): self.ycAxis = 0
-                for button in range(self.Joy.buttons()) :
-                    if joyState.buttonDown(button):
-                        self.buttons.add(LINUX_BUTTON_MAP[button])
+            self.xAxis = joyState.mAxes[3].abs / 32768.0
+            self.yAxis = joyState.mAxes[2].abs / 32768.0
+            self.xcAxis = joyState.mAxes[1].abs / 32768.0
+            self.ycAxis = -joyState.mAxes[0].abs / 32768.0
+            if (self.xAxis > -0.1 and self.xAxis < 0.1): self.xAxis = 0
+            if (self.yAxis > -0.1 and self.yAxis < 0.1): self.yAxis = 0
+            if (self.zAxis > -0.1 and self.zAxis < 0.1): self.zAxis = 0
+            if (self.xcAxis > -0.1 and self.xcAxis < 0.1): self.xcAxis = 0
+            if (self.ycAxis > -0.1 and self.ycAxis < 0.1): self.ycAxis = 0
+            for button in range(self.Joy.buttons()) :
+                if joyState.buttonDown(button):
+                    self.buttons.add(BUTTON_MAP[button])
         
         if (JOYDEBUG): print self.buttons
 
@@ -538,16 +435,15 @@ class GomFrameListener(sf.FrameListener, OgreOde.StepListener, object):
             #self.player.jumpTime = 0.0
             pass
             
-class GomApplication(sf.Application, object):
+class GomApplication(Application, object):
     def __init__(self):
         'Init render application'
         self.level = None
         self.player = None
-        self.lights = []
         self.music = {}
         self.sounds = {}
         
-        sf.Application.__init__(self)
+        Application.__init__(self)
 
     def __del__(self):
         # sound
@@ -562,7 +458,6 @@ class GomApplication(sf.Application, object):
         del self.player
         del self._plane
         del self.overlay
-        del self.lights[:]
 
         # ODE
         print 'ode--'
@@ -579,7 +474,7 @@ class GomApplication(sf.Application, object):
         del self.music
 
         print 'pre-del'
-        sf.Application.__del__(self)
+        Application.__del__(self)
         print 'Application Unloaded'
 
     def _createCamera(self):
@@ -599,16 +494,8 @@ class GomApplication(sf.Application, object):
         global STEP_RATE, ANY_QUERY_MASK, STATIC_GEOMETRY_QUERY_MASK
         sceneManager = self.sceneManager
 
-        # JR: HACK to turn off shadows on my laptop to make things run faster
-        if WINDOWS:
-            if SWEET_LIGHTS: sceneManager.setShadowTechnique(ogre.SHADOWTYPE_STENCIL_ADDITIVE)
-            else: sceneManager.setShadowTechnique(ogre.SHADOWTYPE_STENCIL_MODULATIVE)
-            #sceneManager.setShadowTechnique(ogre.SHADOWTYPE_TEXTURE_ADDITIVE)
-            #sceneManager.setShadowTechnique(ogre.SHADOWTYPE_TEXTURE_MODULATIVE)
-            
-
-            #sceneManager.setShadowTextureSize(1024)
-            sceneManager.setShadowFarDistance(500)
+        sceneManager.setShadowTechnique(ogre.SHADOWTYPE_STENCIL_MODULATIVE)
+        sceneManager.setShadowFarDistance(500)
         
         ogre.MovableObject.setDefaultQueryFlags (ANY_QUERY_MASK)
 
@@ -697,15 +584,7 @@ class GomApplication(sf.Application, object):
         # Create the sun
         l = self.sceneManager.createLight('MainLight')
 
-        #print '  >>', dir(l.getAnimableValueNames())
-        #
-        #for a in l.getAnimableValueNames():
-        #    print "  **", a
-        
         l.setType (ogre.Light.LT_POINT)
-        #dirn = ogre.Vector3(0.5, -1, 0.5)
-        #dirn.normalise()
-        #l.setDirection(dirn)
         pos = ogre.Vector3(300, 900, -300)
         l.setPosition(pos)
         l.setDiffuseColour(ogre.ColourValue(0.8, 0.8, 0.8))
@@ -713,40 +592,14 @@ class GomApplication(sf.Application, object):
         
         #create a secondary dimmer light
         l = self.sceneManager.createLight('SecondLight')
-
-        #print '  >>', dir(l.getAnimableValueNames())
-        #
-        #for a in l.getAnimableValueNames():
-        #    print "  **", a
-        
+      
         l.setType (ogre.Light.LT_POINT)
-        #dirn = ogre.Vector3(0.5, -1, 0.5)
-        #dirn.normalise()
-        #l.setDirection(dirn)
         pos = ogre.Vector3(300, 200, 300)
         l.setPosition(pos)
         l.setDiffuseColour(ogre.ColourValue(0.4, 0.4, 0.4))
         l.setSpecularColour(ogre.ColourValue(0.2, 0.2, 0.2))
         # effectively turn off shadows for this one
         l.setShadowFarDistance(0.01)
-
-        if SWEET_LIGHTS:
-            # Create pulsing lights
-            dirn = ogre.Vector3(0.5, -0.75, 0.5)
-            
-            for i in range(4):
-    
-                dirn = ogre.Quaternion(ogre.Degree(120), ogre.Vector3().UNIT_Y) * dirn
-                dirn.normalise()
-                l = self.sceneManager.createLight('SpotLight%d' % i)
-                l.setType (ogre.Light.LT_SPOTLIGHT)
-                l.setDirection(dirn)
-                l.setDiffuseColour(ogre.ColourValue(0.5, 0.5, 0.5))
-                l.setSpecularColour(ogre.ColourValue(0.5, 0.5, 0.5))
-                l.setSpotlightOuterAngle(ogre.Degree(10))
-                self.lights.append(l)
-        
-
 
     def initializeOde(self):
         # Copied and modified shamelessly from Demo_Scenes.py
