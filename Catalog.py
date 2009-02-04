@@ -927,8 +927,9 @@ def makeBowlingPin(app, name, offset):
 
     c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
     c.node.attachObject(c.body)
-    mass = OgreOde.BoxMass (0.5, ei.getSize())
-    mass.setDensity(0.05, ei.getSize())
+    mass = OgreOde.CapsuleMass(5.0, 10.0, ogre.Vector3().UNIT_Y, 10.0)
+    mass.setDensity(0.05, 4.0, ogre.Vector3().UNIT_Y, 10.0)
+    mass.adjust(2)
     c.body.setMass(mass)
     c.body.setDamping(2,2)
     
@@ -936,6 +937,45 @@ def makeBowlingPin(app, name, offset):
     c.ent.setUserObject(c.geom)
     
     c.body.setPosition(offset)
+
+    c.geom.setUserData(c.id)
+
+    return c
+
+def makeGear(app, name, offset):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    name = name + str(offset)
+    
+    offset = offset + ogre.Vector3(0,1.5,0) 
+
+    c = Container(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'Gear.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
+    c.node.attachObject(c.body)
+    mass = OgreOde.BoxMass (0.5, ei.getSize())
+    mass.setDensity(0.025, ei.getSize())
+    c.body.setMass(mass)
+    c.body.setDamping(2,2)
+    
+    c.geom.setBody(c.body)
+    c.ent.setUserObject(c.geom)
+    
+    c.body.setPosition(offset)
+    
+    c.joint = OgreOde.HingeJoint(app._world)
+    c.joint.attach(c.body)
+    c.joint.setAxis(ogre.Vector3().UNIT_Y)
+    c.joint.setAnchor(offset)
 
     c.geom.setUserData(c.id)
 
