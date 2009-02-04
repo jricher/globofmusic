@@ -913,7 +913,7 @@ def makeBowlingPin(app, name, offset):
     root = scn.getRootSceneNode()
     name = name + str(offset)
     
-
+    offset = offset + ogre.Vector3(0,5.01,0)
     c = Container(name)
     containers[c.id] = c
     c.ent = scn.createEntity(name, 'BowlingPin.mesh')
@@ -927,9 +927,8 @@ def makeBowlingPin(app, name, offset):
 
     c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
     c.node.attachObject(c.body)
-    mass = OgreOde.CapsuleMass(5.0, 10.0, ogre.Vector3().UNIT_Y, 10.0)
-    mass.setDensity(0.05, 4.0, ogre.Vector3().UNIT_Y, 10.0)
-    mass.adjust(2)
+    mass = OgreOde.CapsuleMass(0.05, 2.0, ogre.Vector3().UNIT_Y, 10.0)
+    mass.setDensity(0.02, 2.0, ogre.Vector3().UNIT_Y, 10.0)
     c.body.setMass(mass)
     c.body.setDamping(2,2)
     
