@@ -1075,3 +1075,118 @@ def makeBridge(app, name, offset):
     end.anchor.attach(end.body)
     end.anchor.setAxis(ogre.Vector3().UNIT_X)
     end.anchor.setAnchor(offset + ogre.Vector3(0, 0, 5.5))
+    
+def makeInnerWall(app, name, offset, angle=0):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    name = name + str(offset)
+    
+    c = Container(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(c.name, "InnerWall.mesh")
+    
+    c.ent.setCastShadows(False)
+
+    c.node = root.createChildSceneNode(c.ent.getName())
+    c.node.attachObject(c.ent)
+
+    c.node.setPosition(offset)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
+
+    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+    c.geom.setPosition(c.node.getPosition())
+    c.geom.setUserData(c.id)
+    
+    return c
+
+def makeCone(app, name, offset):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    name = name + str(offset)
+    
+    offset = offset + ogre.Vector3(0,0.01,0)
+    c = Container(name)
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'Cone.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
+    c.node.attachObject(c.body)
+    mass = OgreOde.BoxMass (5.5, ei.getSize())
+    mass.setDensity(0.50, ei.getSize())
+    c.body.setMass(mass)
+    
+    c.geom.setBody(c.body)
+    c.ent.setUserObject(c.geom)
+    
+    c.body.setPosition(offset)
+
+    c.geom.setUserData(c.id)
+
+    return c
+    
+def makeTiltRamp(app, name, offset, angle=0, sound=None):
+    scn = app.sceneManager
+    root = scn.getRootSceneNode()
+    name = name + str(offset)
+    
+    offset = offset + ogre.Vector3(0,0.1,0) 
+
+    c = Platform(name, materialName = "TiltRamp-")
+    containers[c.id] = c
+    c.ent = scn.createEntity(name, 'TiltRamp.mesh')
+    c.node = root.createChildSceneNode(name)
+    c.node.attachObject(c.ent)
+
+    c.ent.setCastShadows(True)
+
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
+
+    c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
+    c.node.attachObject(c.body)
+    mass = OgreOde.BoxMass (0.5, ei.getSize())
+    mass.setDensity(0.5, ei.getSize())
+    c.body.setMass(mass)
+    c.body.setDamping(2,2)
+    
+    c.geom.setBody(c.body)
+    c.ent.setUserObject(c.geom)
+    
+    c.body.setPosition(offset)
+    
+    c.joint = OgreOde.HingeJoint(app._world)
+    c.joint.attach(c.body)
+    c.joint.setAxis(ogre.Vector3().UNIT_Y)
+    c.joint.setAnchor(offset)
+    
+    c.motor = OgreOde.AngularMotorJoint(app._world)
+    c.motor.setAnchor(offset)
+    c.motor.attach(c.body)
+    c.motor.setAxisCount(1)
+    c.motor.setAxis(0, OgreOde.AngularMotorJoint.RelativeOrientation_GlobalFrame, ogre.Vector3().UNIT_Y)
+
+    c.motor.setMode(OgreOde.AngularMotorJoint.Mode_UserAngularMotor)
+    c.motor.setAngle(0, 0)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MaximumForce, 5, 1)
+    c.motor.setParameter(OgreOde.Joint.Parameter_MotorVelocity, 0, 1)
+
+    c.geom.setUserData(c.id)
+
+
+    c.setMaterial()
+
+    if sound:
+        c.sound = app.sounds[sound]
+    else:
+        c.sound = app.sounds['tone-%d' % random.randrange(8)]
+
+    return c
