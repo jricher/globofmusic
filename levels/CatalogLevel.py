@@ -29,6 +29,7 @@ class Level(BaseLevel):
         makeIcePlatform(app, 'An Ice Platform', self.offset + ogre.Vector3(60, 1, 20))
         makeTiltRamp(app, "A Tilting Ramp", self.offset + ogre.Vector3(50,0,20))
         makeInnerWall(app, "An InnerWall", self.offset + ogre.Vector3(40,0,20))
+        makeInnerWall(app, "An InnerWall", self.offset + ogre.Vector3(30,0,20), 45)
         
         #Row 2
         makeOnOffRamp(app, 'An On Off Ramp', self.offset + ogre.Vector3(140, 1, 0))

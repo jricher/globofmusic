@@ -82,7 +82,7 @@ def makeBlockingWall(app, offset, i):
 
     c.node.setPosition(offset)
 
-    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
     c.geom = ei.createSingleStaticBox(app._world, app._space)
     #c.geom = c.body.getGeometry(0)
 
@@ -116,7 +116,7 @@ def makeCrate(app, name, offset, angle=0):
     c.node.setOrientation(quat)
     c.node.setScale(2, 2.5, 2)
 
-    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
     c.body = ei.createSingleDynamicBox(0.5, app._world, app._space)
     #c.body.setDamping(2,2)
     #c.body.sleep() # put the crates to sleep until we need them
@@ -149,7 +149,7 @@ def makeMetalCrate(app, name, offset):
 
     c.node.setScale(2, 2.5, 2)
 
-    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
     c.body = ei.createSingleDynamicBox(1.5, app._world, app._space)
     c.body.setDamping(2,2)
     c.body.sleep() # put the crates to sleep until we need them
@@ -361,7 +361,7 @@ def makeSwingingDoors(app, offset):
     c.node.setPosition(ogre.Vector3(4,2.5,0) + offset)
     c.node.setScale(4,1,2)
 
-    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
     c.body = ei.createSingleDynamicBox(20.0, app._world, app._space)
     c.body.setDamping(0,2)
     c.geom = c.body.getGeometry(0)
@@ -389,7 +389,7 @@ def makeSwingingDoors(app, offset):
     c.node.attachObject(c.ent)
     c.node.setPosition(ogre.Vector3(-4.1,2.5,0) + offset)
     c.node.setScale(4,1,2)
-    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
     c.body = ei.createSingleDynamicBox(20.0, app._world, app._space)
     c.body.setDamping(0,2)
     c.geom = c.body.getGeometry(0)
@@ -650,7 +650,8 @@ def makeDomino(app, name, offset, angle=0, material = 'Domino-', sound=None):
     c.node.setPosition(offset)
     quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
     c.node.setOrientation(quat)
-    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    # ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale())) #< -- this one works for some reason
+    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
     c.body = ei.createSingleDynamicBox(5.0,app._world, app._space)
     c.body.setDamping(2,2)
     c.geom = c.body.getGeometry(0)
@@ -685,7 +686,7 @@ def makeBall(app, name, offset):
     c.node.attachObject(c.ent)
     c.node.setPosition(offset)
 
-    ei = OgreOde.EntityInformer(c.ent, ogre.Matrix4.getScale(c.node.getScale()))
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
     c.body = ei.createSingleDynamicSphere(10.0, app._world, app._space)
 
     c.geom = c.body.getGeometry(0)
@@ -835,8 +836,8 @@ def makePlank(app, name, offset, angle=0, sound=None):
     quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
     c.node.setOrientation(quat)
     #print 'scale', str(c.node.getScale())
-    #print '  mtx', str(ogre.Matrix4.getScale(c.node.getScale()))
-    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    #print '  mtx', str(c.node._getFullTransform())
+    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
     c.body = ei.createSingleDynamicBox(0.5,app._world, app._space)
     c.body.setDamping(2, 2)
     c.geom = c.body.getGeometry(0)
@@ -899,7 +900,7 @@ def makeBallBearing(app, name, offset, angle=0):
     c.node.attachObject(c.ent)
     c.node.setPosition(offset)
 
-    ei = OgreOde.EntityInformer(c.ent, ogre.Matrix4.getScale(c.node.getScale()))
+    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
     c.body = ei.createSingleDynamicSphere(10.0, app._world, app._space)
 
     c.geom = c.body.getGeometry(0)
@@ -1094,9 +1095,9 @@ def makeInnerWall(app, name, offset, angle=0):
     quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
     c.node.setOrientation(quat)
 
-    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
+    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
     c.geom = ei.createStaticTriangleMesh(app._world, app._space)
-    c.geom.setPosition(c.node.getPosition())
+    #c.geom.setPosition(c.node.getPosition())
     c.geom.setUserData(c.id)
     
     return c
@@ -1120,14 +1121,16 @@ def makeCone(app, name, offset):
 
     c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
     c.node.attachObject(c.body)
-    mass = OgreOde.BoxMass (5.5, ei.getSize())
-    mass.setDensity(0.50, ei.getSize())
+    mass = OgreOde.BoxMass (2.5, ei.getSize())
+    mass.setDensity(0.1, ei.getSize())
     c.body.setMass(mass)
     
     c.geom.setBody(c.body)
     c.ent.setUserObject(c.geom)
     
     c.body.setPosition(offset)
+
+    c.friction = 10
 
     c.geom.setUserData(c.id)
 
