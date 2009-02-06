@@ -22,14 +22,14 @@ class Level(BaseLevel):
         makeBall(app, 'A Ball', self.offset + ogre.Vector3(130, 1, 20))
         makeBarbell(app, 'A Barbell', self.offset + ogre.Vector3(120, 1, 20))
         makeBell(app, 'A Bell', self.offset + ogre.Vector3(110, 1, 20))
-        makeRupee(app, "A Rupee", self.offset + ogre.Vector3(100,3,20))
         
-        makePlatform(app, 'A Platform', self.offset + ogre.Vector3(80, 1,20))
+        
+        makePlatform(app, 'A Platform', self.offset + ogre.Vector3(90, 1,20))
         makeTiltingPlatform(app, "A Tilting Platform", self.offset + ogre.Vector3(70, 1,20))
-        makeIcePlatform(app, 'An Ice Platform', self.offset + ogre.Vector3(60, 1, 20))
-        makeTiltRamp(app, "A Tilting Ramp", self.offset + ogre.Vector3(50,0,20))
-        makeInnerWall(app, "An InnerWall", self.offset + ogre.Vector3(40,0,20))
-        #makeInnerWall(app, "An InnerWall", self.offset + ogre.Vector3(30,0,20), 45)
+        makeIcePlatform(app, 'An Ice Platform', self.offset + ogre.Vector3(50, 1, 20))
+        makeTiltRamp(app, "A Tilting Ramp", self.offset + ogre.Vector3(35,0,20))
+        makeInnerWall(app, "An InnerWall", self.offset + ogre.Vector3(20,0,20))
+        #makeInnerWall(app, "An InnerWall", self.offset + ogre.Vector3(20,0,20), 45)
         
         #Row 2
         makeOnOffRamp(app, 'An On Off Ramp', self.offset + ogre.Vector3(140, 1, 0))
@@ -45,6 +45,7 @@ class Level(BaseLevel):
         
         #Row 3
         makeDomino(app, "A Domino", self.offset + ogre.Vector3(140,1,-20))
+        makeRupee(app, "A Rupee", self.offset + ogre.Vector3(130,3,-20))
         makeDomino(app, "A Domino Turned", self.offset + ogre.Vector3(120,1,-20), 90)
         makeUnlockKey(app, self.offset + ogre.Vector3(100,2,-20))
         makeSwingingDoors(app, self.offset + ogre.Vector3(80,1,-20))
