@@ -883,25 +883,25 @@ def makeStartRoom(app, offset, i):
     walls.geom.setUserData(walls.id)
     
     #Starting Room platform
-    lock = makeLevelLock(app, offset)
-
-    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, -10), sound='key-0')
-    c.quant = 8
-
-    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, 10), sound='key-1', lock=lock)
-    c.quant = 8
-
-    c = makeUnlockKey(app, offset + ogre.Vector3(10, 2, 0), sound='key-2')
-    c.quant = 8
-
-    #makeBarbell(app, "A Domino", offset + ogre.Vector3(-10,10,0), 0)
-
-    c = makeUnlockKey(app, offset + ogre.Vector3(-10, 2, 0), sound='key-3')
-    c.quant = 8
-
-    (leftDoor, rightDoor) = makeSwingingDoors(app, offset + ogre.Vector3(0, 0, 24.5))
-    leftDoor.lock(app._world, lock)
-    rightDoor.lock(app._world, lock)
+##    lock = makeLevelLock(app, offset)
+##
+##    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, -10), sound='key-0')
+##    c.quant = 8
+##
+##    c = makeUnlockKey(app, offset + ogre.Vector3(0, 2, 10), sound='key-1', lock=lock)
+##    c.quant = 8
+##
+##    c = makeUnlockKey(app, offset + ogre.Vector3(10, 2, 0), sound='key-2')
+##    c.quant = 8
+##
+##    #makeBarbell(app, "A Domino", offset + ogre.Vector3(-10,10,0), 0)
+##
+##    c = makeUnlockKey(app, offset + ogre.Vector3(-10, 2, 0), sound='key-3')
+##    c.quant = 8
+##
+##    (leftDoor, rightDoor) = makeSwingingDoors(app, offset + ogre.Vector3(0, 0, 24.5))
+##    leftDoor.lock(app._world, lock)
+##    rightDoor.lock(app._world, lock)
     
     return Arena(floor, walls, i)
      
