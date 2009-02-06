@@ -18,7 +18,7 @@ class Level(BaseLevel):
         # Arranges the available objects, but doesn't do scaling
         
         #Row 1
-        makeCrate(app, 'A Crate', self.offset + ogre.Vector3(140, 1, 20))
+        makeCrate(app, 'A Crate', self.offset + ogre.Vector3(140, 1, 20), 45)
         makeBall(app, 'A Ball', self.offset + ogre.Vector3(130, 1, 20))
         makeBarbell(app, 'A Barbell', self.offset + ogre.Vector3(120, 1, 20))
         makeBell(app, 'A Bell', self.offset + ogre.Vector3(110, 1, 20))
@@ -49,7 +49,7 @@ class Level(BaseLevel):
         makeUnlockKey(app, self.offset + ogre.Vector3(100,2,-20))
         makeSwingingDoors(app, self.offset + ogre.Vector3(80,1,-20))
         makeDonut(app, "A Donut", self.offset + ogre.Vector3(60,2,-20))
-        makePlank(app, "A Plank", self.offset + ogre.Vector3(50,1,-20))
+        makePlank(app, "A Plank", self.offset + ogre.Vector3(50,1,-20), 45)
         makeBallBearing(app, "A Ball Bearing", self.offset + ogre.Vector3(40,2,-20))
         makeBell(app, 'A Bell', self.offset + ogre.Vector3(30, 1, -20))
         

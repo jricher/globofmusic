@@ -116,7 +116,7 @@ def makeCrate(app, name, offset, angle=0):
     c.node.setOrientation(quat)
     c.node.setScale(2, 2.5, 2)
 
-    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
+    ei = OgreOde.EntityInformer (c.ent, ogre.Matrix4.getScale(c.node.getScale()))
     c.body = ei.createSingleDynamicBox(0.5, app._world, app._space)
     #c.body.setDamping(2,2)
     #c.body.sleep() # put the crates to sleep until we need them
@@ -149,7 +149,7 @@ def makeMetalCrate(app, name, offset):
 
     c.node.setScale(2, 2.5, 2)
 
-    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
+    ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
     c.body = ei.createSingleDynamicBox(1.5, app._world, app._space)
     c.body.setDamping(2,2)
     c.body.sleep() # put the crates to sleep until we need them
@@ -362,6 +362,7 @@ def makeSwingingDoors(app, offset):
     c.node.setScale(4,1,2)
 
     ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
+    #ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale()))
     c.body = ei.createSingleDynamicBox(20.0, app._world, app._space)
     c.body.setDamping(0,2)
     c.geom = c.body.getGeometry(0)
@@ -650,8 +651,10 @@ def makeDomino(app, name, offset, angle=0, material = 'Domino-', sound=None):
     c.node.setPosition(offset)
     quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
     c.node.setOrientation(quat)
-    # ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale())) #< -- this one works for some reason
-    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
+    #ei = OgreOde.EntityInformer (c.ent,ogre.Matrix4.getScale(c.node.getScale())) #< -- this one works for some reason
+    #ei = OgreOde.EntityInformer (c.ent, c.node._getFullTransform())
+    ei = OgreOde.EntityInformer (c.ent)
+    
     c.body = ei.createSingleDynamicBox(5.0,app._world, app._space)
     c.body.setDamping(2,2)
     c.geom = c.body.getGeometry(0)
@@ -712,13 +715,16 @@ def makeBarbell(app, name, offset, angle=0):
 
     c.ent.setCastShadows(True)
 
-    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    #ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    #ei = OgreOde.EntityInformer(c.ent, ogre.Matrix4.getScale(c.node.getScale()))
+    ei = OgreOde.EntityInformer(c.ent)
+    
     c.geom = ei.createStaticTriangleMesh(app._world, app._space)
 
     c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
     c.node.attachObject(c.body)
-    mass = OgreOde.BoxMass (5.0, ei.getSize()) ## TODO: make it the sphere mass
-    mass.setDensity(5.0, ei.getSize())
+    mass = OgreOde.BoxMass (1.0, ei.getSize()) ## TODO: make it the sphere mass
+    mass.setDensity(1.0, ei.getSize())
     c.body.setMass(mass)
 
     c.geom.setBody(c.body)
@@ -728,9 +734,10 @@ def makeBarbell(app, name, offset, angle=0):
     quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
     c.body.setOrientation(quat)
     
-    c.body.wake()
 
     c.geom.setUserData(c.id)
+    
+    c.friction = 400
 
     return c
     
@@ -837,7 +844,8 @@ def makePlank(app, name, offset, angle=0, sound=None):
     c.node.setOrientation(quat)
     #print 'scale', str(c.node.getScale())
     #print '  mtx', str(c.node._getFullTransform())
-    ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
+    #ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
+    ei = OgreOde.EntityInformer (c.ent, c.node._getFullTransform())
     c.body = ei.createSingleDynamicBox(0.5,app._world, app._space)
     c.body.setDamping(2, 2)
     c.geom = c.body.getGeometry(0)
@@ -976,7 +984,10 @@ def makeGear(app, name, offset):
     c.joint.attach(c.body)
     c.joint.setAxis(ogre.Vector3().UNIT_Y)
     c.joint.setAnchor(offset)
-
+    
+    #c.body.setAngularDamping(1000)  # Make it  slow down
+    c.body.setAngularVelocity(ogre.Vector3().NEGATIVE_UNIT_Y);
+    
     c.geom.setUserData(c.id)
 
     return c
@@ -1097,7 +1108,6 @@ def makeInnerWall(app, name, offset, angle=0):
 
     ei = OgreOde.EntityInformer (c.ent,c.node._getFullTransform())
     c.geom = ei.createStaticTriangleMesh(app._world, app._space)
-    #c.geom.setPosition(c.node.getPosition())
     c.geom.setUserData(c.id)
     
     return c
@@ -1116,7 +1126,7 @@ def makeCone(app, name, offset):
 
     c.ent.setCastShadows(True)
 
-    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
+    ei = OgreOde.EntityInformer(c.ent,ogre.Matrix4.getScale(c.node.getScale()))
     c.geom = ei.createStaticTriangleMesh(app._world, app._space)
 
     c.body = OgreOde.Body(app._world, 'OgreOde::Body_' + c.node.getName())
