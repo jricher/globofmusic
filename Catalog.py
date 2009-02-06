@@ -860,7 +860,7 @@ def makePlank(app, name, offset, angle=0, sound=None):
 
     return c
 
-def makeDonut(app, name, offset, angle=0):
+def makeDonut(app, name, offset):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
     name = name + str(offset)
@@ -895,7 +895,7 @@ def makeDonut(app, name, offset, angle=0):
 
     return c
 
-def makeBallBearing(app, name, offset, angle=0):
+def makeBallBearing(app, name, offset):
     scn = app.sceneManager
     rootNode = scn.getRootSceneNode()
     name = name + str(offset)
