@@ -29,16 +29,16 @@ class Level(BaseLevel):
         platform.sound = app.sounds['tone-7']
         
         
-        key = makeLevelLock(app, self.offset)
+        lock = makeLevelLock(app, self.offset)
 
         c = makeUnlockKey(app, self.offset + ogre.Vector3(0, 2, 10), sound='key-1')
         c.quant = 8
-        c.key = key
-        key.sources.append(c)
+        c.key = lock
+        lock.sources.append(c)
     
         (leftDoor, rightDoor) = makeSwingingDoors(app, self.offset + ogre.Vector3(0, 0, 50))
-        leftDoor.lock(app._world, key)
-        rightDoor.lock(app._world, key)
+        leftDoor.lock(app._world, lock)
+        rightDoor.lock(app._world, lock)
         #key.doors.append(leftDoor)
         #key.doors.append(rightDoor)
         

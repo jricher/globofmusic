@@ -443,7 +443,7 @@ class LevelManager(OgreOde.CollisionListener, object):
 
             
     def fireworks(self, level):
-        if (not self.particles.has_key("Fireworks")):
+        if (not particles.has_key("Fireworks")):
             scn = self.rootNode.getCreator()
             c = Container("Fireworks")
             c.particleSystem = scn.createParticleSystem('fireworks', 'Examples/njrFireworks')
@@ -455,7 +455,7 @@ class LevelManager(OgreOde.CollisionListener, object):
         
             c.node.attachObject(c.particleSystem)
         
-            self.particles["Fireworks"] = c
+            particles["Fireworks"] = c
             
             #overlay = ogre.OverlayManager.getSingleton().getByName('CongratsOverlay')
             #overlay.show()

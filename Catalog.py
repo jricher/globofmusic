@@ -652,6 +652,8 @@ def makeMetalCrate(app, name, offset):
     root = scn.getRootSceneNode()
     name = name + str(offset)
     
+    offset = offset + ogre.Vector3(0,1.25,0)
+    
     c = Fireable(name)
     containers[c.id] = c
     c.ent = scn.createEntity(name, "Cube.mesh")

@@ -188,7 +188,7 @@ class GomFrameListener(FrameListener, OgreOde.StepListener, object):
     def _processUnbufferedKeyInput(self, frameEvent):
 
         # quit command
-        if self.Keyboard.isKeyDown(OIS.KC_ESCAPE) or self.Keyboard.isKeyDown(OIS.KC_Q):
+        if self.Keyboard.isKeyDown(OIS.KC_ESCAPE):
             print 'Quitting'
             return False
 
