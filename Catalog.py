@@ -1055,6 +1055,8 @@ def makeTiltRamp(app, name, offset, angle=0, sound=None):
     c.ent = scn.createEntity(name, 'TiltRamp.mesh')
     c.node = root.createChildSceneNode(name)
     c.node.attachObject(c.ent)
+    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
+    c.node.setOrientation(quat)
 
     c.ent.setCastShadows(True)
 

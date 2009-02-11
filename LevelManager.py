@@ -255,7 +255,7 @@ class LevelManager(OgreOde.CollisionListener, object):
             self.decayParticle = True
             self.particles["StartArrow"] = particles["StartArrow"]
             self.particleTimeout = 4
-            particles.clear()
+            del particles["StartArrow"]
 
         # set the appropriate background music
         if self.currentLevel > 0 and self.levels[self.currentLevel].backgroundMusic:
@@ -273,6 +273,8 @@ class LevelManager(OgreOde.CollisionListener, object):
         #trigger any animation
         if (self.levels[self.currentLevel].startLevelCallback):
                 self.levels[self.currentLevel].startLevelCallback(self.levels[self.currentLevel])
+        if (self.levels[oldlevel].stopLevelCallback):
+                self.levels[oldlevel].stopLevelCallback(self.levels[oldlevel])
         
         # move the camera
         if oldlevel != -1: # Don't animate the camera to start

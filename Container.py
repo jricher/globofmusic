@@ -474,9 +474,9 @@ class Door(Container):
         
     def collide(self, other, contact, normal, lm):
         if self.locked and isinstance(other, Player):
-            self.overlay = ogre.OverlayManager.getSingleton().getByName('DoorLockedOverlay')
-            self.overlay.show()
-            self.overlayTimeout = 1
+            lm.overlay = ogre.OverlayManager.getSingleton().getByName('DoorLockedOverlay')
+            lm.overlay.show()
+            lm.overlayTimeout = 1
         return True
 
     def collideWith(self, other, contact, normal, lm):

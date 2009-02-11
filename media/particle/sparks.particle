@@ -1,0 +1,50 @@
+particle_system sparks
+{
+	quota	1000
+	material	Examples/Flare
+	particle_width	2
+	particle_height	2
+	cull_each	true
+	renderer	billboard
+	sorted	true
+	local_space	false
+	billboard_type	point
+
+	emitter Box
+	{
+		angle	0
+		colour	1 0 0 1
+		colour_range_start	0.5 0.5 0.5 0.5
+		colour_range_end	1 0.5 0.5 1
+		direction	0 1 0
+		emission_rate	100
+		position	0 0 0
+		velocity	10
+		velocity_min	5
+		velocity_max	20
+		time_to_live	20
+		time_to_live_min	20
+		time_to_live_max	20
+		duration	0
+		duration_min	0
+		duration_max	0
+		repeat_delay	0
+		repeat_delay_min	0
+		repeat_delay_max	0
+		width	100
+		height	100
+		depth	1
+	}
+
+	affector DeflectorPlane
+	{
+		plane_point	0 0 0
+		plane_normal	0 1 0
+		bounce	0
+	}
+
+	affector DirectionRandomiser
+	{
+		randomness	50
+	}
+}
