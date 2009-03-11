@@ -1,0 +1,56 @@
+material Icy-waiting
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			ambient .1 .1 .5 .1
+			diffuse .4 .4 .5 .1
+			specular 1.0 1.0 1.0 1.0 62.250000
+			emissive .1 .1 .1 1.0
+		}
+	}
+}
+material Icy-armed
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			ambient .1 .5 .5 .1
+			diffuse .4 .5 .4 .1
+			specular 1.0 1.0 1.0 1.0 62.250000
+			emissive .1 .1 .1 1.0
+		}
+	}
+}
+material Icy-fired
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			ambient .1 .1 .5 .05
+			diffuse .4 .5 .4 .05
+			specular 1.0 1.0 1.0 1.0 62.250000
+			emissive .2 .2 .2 1.0
+		}
+	}
+}
+material Icy-done
+{
+	receive_shadows off
+	technique
+	{
+		pass
+		{
+			ambient .1 .1 .5 .05
+			diffuse .5 .4 .4 .05
+			specular 1.0 1.0 1.0 1.0 62.250000
+			emissive .2 .2 .2 1.0
+		}
+	}
+}
