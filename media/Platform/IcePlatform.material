@@ -1,0 +1,59 @@
+material IcePlatform-waiting
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.7 0.8 0.9 1.000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material IcePlatform-armed
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.1000000
+			diffuse 0.7 0.8 0.9 0.1000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 0.100000
+			scene_blend alpha_blend
+		}
+	}
+}
+material IcePlatform-fired
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.5000000
+			diffuse 0.3 0.3 0.9 0.5000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 0.500000
+			scene_blend alpha_blend
+		}
+	}
+}
+material IcePlatform-done
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 0.5000000
+			diffuse 0.3 0.3 0.9 0.5000000
+			specular 1.000000 1.000000 1.000000 1.000000 62.250000
+			emissive 0.000000 0.000000 0.000000 0.500000
+			scene_blend alpha_blend
+		}
+	}
+}

@@ -566,41 +566,6 @@ def makeGear(app, name, offset):
 
     return c
 
-def makeIcePlatform(app, name, offset, angle=0, material = None, sound=None):
-    scn = app.sceneManager
-    root = scn.getRootSceneNode()
-    name = name + str(offset)
-    
-    c = Platform(name = name, materialName = material)
-    containers[c.id] = c
-    c.ent = scn.createEntity(name, 'IceChunk.mesh')
-    c.node = root.createChildSceneNode(name)
-    c.node.setPosition(offset)
-    c.node.attachObject(c.ent)
-    quat = ogre.Quaternion(ogre.Degree(angle),ogre.Vector3().UNIT_Y)
-    c.node.setOrientation(quat)
-
-    c.ent.setCastShadows(True)
-
-    ei = OgreOde.EntityInformer(c.ent, c.node._getFullTransform())
-    c.geom = ei.createStaticTriangleMesh(app._world, app._space)
-
-    c.ent.setUserObject(c.geom)
-    
-    if sound:
-        c.sound = app.sounds[sound]
-    else:
-        c.sound = app.sounds['tone-%d' % random.randrange(8)]
-
-    # set the initial material
-    c.setMaterial()
-
-    c.geom.setUserData(c.id)
-
-    c.friction = 10
-
-    return c
-  
 def makeInnerWall(app, name, offset, angle=0):
     scn = app.sceneManager
     root = scn.getRootSceneNode()
